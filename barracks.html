@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Kasárna</title>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
+    <link href="css/styles.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"
+        crossorigin="anonymous"></script>
+</head>
+
+<body class="sb-nav-fixed">
+    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+        <!-- Navbar Brand-->
+        <a class="navbar-brand ps-3" href="index.html">Název města</a>
+        <!-- Sidebar Toggle-->
+        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i
+                class="fas fa-bars"></i></button>
+        <!-- Navbar-->
+        <ul class="navbar-nav ms-auto ms-auto me-0 me-md-3 my-2 my-md-0 d-none d-md-inline-block form-inline">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false"><i class="fas fa-user fa-fw"></i> Jméno </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                    <li><a class="dropdown-item" href="#!">Settings</a></li>
+                    <li><a class="dropdown-item" href="#!">Activity Log</a></li>
+                    <li>
+                        <hr class="dropdown-divider" />
+                    </li>
+                    <li><a class="dropdown-item" href="#!">Logout</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+    <div id="layoutSidenav">
+        <div id="layoutSidenav_nav">
+            <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                <div class="sb-sidenav-menu">
+                    <div class="nav">
+
+                        <div class="sb-sidenav-menu-heading">Budovy</div>
+                        <a class="nav-link" href="castle.html">
+                            <div class="sb-nav-link-icon"><i class="fab fa-fort-awesome-alt"></i></div>
+                            Hrad
+                        </a>
+                        <a class="nav-link" href="gold-mine.html">
+                            <div class="sb-nav-link-icon"><i class="fas fa-cubes"></i></div>
+                            Zlatý důl
+                        </a>
+                        <a class="nav-link active" href="barracks.html">
+                            <div class="sb-nav-link-icon"><i class="fas fa-chess-rook"></i></div>
+                            Kasárna
+                        </a>
+                        <a class="nav-link" href="mint.html">
+                            <div class="sb-nav-link-icon"><i class="fas fa-coins"></i></div>
+                            Mincovna
+                        </a>
+
+                        <div class="sb-sidenav-menu-heading">Jednotky</div>
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                            data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
+                            <div class="sb-nav-link-icon"><i class="fas fa-chess-pawn"></i></div>
+                            Šermíř
+                        </a>
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                            data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
+                            <div class="sb-nav-link-icon"><i class="fas fa-chess-bishop"></i></div>
+                            Lukostřelec
+                        </a>
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                            data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
+                            <div class="sb-nav-link-icon"><i class="fas fa-chess-knight"></i></div>
+                            Jízda
+                        </a>
+                        <div class="sb-sidenav-menu-heading">Addons</div>
+                        <a class="nav-link" href="charts.html">
+                            <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+                            Charts
+                        </a>
+                        <a class="nav-link" href="tables.html">
+                            <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                            Tables
+                        </a>
+                    </div>
+                </div>
+                <!-- <div class="sb-sidenav-footer">
+                        <div class="small">Logged in as:</div>
+                        Start Bootstrap
+                    </div> -->
+            </nav>
+        </div>
+        <div id="layoutSidenav_content">
+            <main>
+                <div class="container-fluid px-4">
+                    <h1 class="mt-4">Kasárna</h1>
+                    <button type="button" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="right"
+                        style="background-color: transparent; border: solid transparent;" data-bs-content="V kasárnách rekrutuješ své jednotky, každá jednotka má své výhody
+                        či nevýhody. Některé jsou zdatnější na boj z blízka, jiné zase na dálku a 
+                        další zase na obranu nebo útok. Zbroj moudře!">
+                        <i class="fas fa-info-circle"></i>
+                    </button>
+                    <div class="row justify-content-around mb-4">
+                        <div class="col-2">
+                            <b>Jednotka</b>
+                        </div>
+                        <div class="col-2">
+                            <b>Aktuální počet</b>
+                        </div>
+                        <div class="col-2">
+                            <b>Náklady / 1</b>
+                        </div>
+                        <div class="col-2">
+                            <b>Čas rekrutace / 1</b>
+                        </div>
+                        <div class="col-2">
+                            <b>Možnosti</b>
+                        </div>
+                    </div>
+                    <div class="row justify-content-around mb-2">
+                        <div class="col-2">
+                            Šermíř
+                        </div>
+                        <div class="col-2">
+                            0
+                        </div>
+                        <div class="col-2">
+                            5 <i class="fas fa-cube" style="color: rgb(139, 126, 0);"></i> /
+                            1 <i class="fas fa-circle" style="color: rgb(139, 126, 0);"></i>
+                        </div>
+                        <div class="col-2">
+                            00:08:36
+                        </div>
+                        <div class="col-2">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#swordModal">
+                                Rekrutovat
+                            </button>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="swordModal" tabindex="-1" aria-labelledby="swordModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="swordModalLabel">Šermíř</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <nav>
+                                                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+
+                                                    <button class="nav-link active" id="nav-recruit-tab"
+                                                        data-bs-toggle="tab" data-bs-target="#nav-recruit" type="button"
+                                                        role="tab" aria-controls="nav-recruit" aria-selected="true">
+                                                        Rekrutovat
+                                                    </button>
+
+                                                    <button class="nav-link" id="nav-discharge-tab" data-bs-toggle="tab"
+                                                        data-bs-target="#nav-discharge" type="button" role="tab"
+                                                        aria-controls="nav-discharge" aria-selected="false">
+                                                        Propustit ze služby
+                                                    </button>
+
+                                                </div>
+                                            </nav>
+                                            <div class="tab-content" id="nav-tabContent">
+                                                <div class="tab-pane fade show active" id="nav-recruit" role="tabpanel"
+                                                    aria-labelledby="nav-recruit-tab mt-2 mb-5">
+                                                    <div class="container">
+                                                        <div class="row justify-content-around mt-4">
+                                                            <div class="col-3">
+                                                                <b>Počet</b>
+                                                            </div>
+                                                            <div class="col-3">
+                                                                <b>Náklady</b>
+                                                            </div>
+                                                            <div class="col-3">
+                                                                <b>Čas</b>
+                                                            </div>
+                                                            <div class="col-3">
+                                                                
+                                                            </div>
+                                                        </div>
+                                                        <div class="row justify-content-around mt-2 mb-2">
+                                                            <div class="col-3">
+                                                                <input type="number" class="form-control" id="basic-url"
+                                                                    aria-describedby="basic-addon3" min="1">
+                                                            </div>
+                                                            <div class="col-3">
+                                                                5 <i class="fas fa-cube"
+                                                                    style="color: rgb(139, 126, 0);"></i> /
+                                                                1 <i class="fas fa-circle"
+                                                                    style="color: rgb(139, 126, 0);"></i>
+                                                            </div>
+                                                            <div class="col-3">
+                                                                00:08:36
+                                                            </div>
+                                                            <div class="col-3">
+                                                                <button class="btn btn-primary">OK</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane fade" id="nav-discharge" role="tabpanel"
+                                                    aria-labelledby="nav-discharge-tab">
+                                                    <div class="container">
+                                                        <div class="row justify-content-around mt-4">
+                                                            <div class="col-3">
+                                                                <b>Počet</b>
+                                                            </div>
+                                                            <div class="col-3">
+                                                                <b>Vrácení</b>
+                                                            </div>
+                                                            <div class="col-3">
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="row justify-content-around mt-2 mb-2">
+                                                            <div class="col-3">
+                                                                <input type="number" class="form-control" id="basic-url"
+                                                                    aria-describedby="basic-addon3" min="1">
+                                                            </div>
+                                                            <div class="col-3">
+                                                                3 <i class="fas fa-cube"
+                                                                    style="color: rgb(139, 126, 0);"></i>
+                                                            </div>
+                                                            <div class="col-3">
+                                                                <button class="btn btn-primary">OK</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Zavřít</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row justify-content-around mb-2">
+                        <div class="col-2">
+                            Lukostřelec
+                        </div>
+                        <div class="col-2">
+                            0
+                        </div>
+                        <div class="col-2">
+                            4 <i class="fas fa-cube" style="color: rgb(139, 126, 0);"></i> /
+                            1 <i class="fas fa-circle" style="color: rgb(139, 126, 0);"></i>
+                        </div>
+                        <div class="col-2">
+                            00:06:36
+                        </div>
+                        <div class="col-2">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#bowModal">
+                                Rekrutovat
+                            </button>
+
+                            <!-- Modal bow -->
+                            <div class="modal fade" id="bowModal" tabindex="-1" aria-labelledby="bowModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="bowModalLabel">Lukostřelec</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <nav>
+                                                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+
+                                                    <button class="nav-link active" id="nav-recruit1-tab"
+                                                        data-bs-toggle="tab" data-bs-target="#nav-recruit1" type="button"
+                                                        role="tab" aria-controls="nav-recruit1" aria-selected="true">
+                                                        Rekrutovat
+                                                    </button>
+
+                                                    <button class="nav-link" id="nav-discharge1-tab" data-bs-toggle="tab"
+                                                        data-bs-target="#nav-discharge1" type="button" role="tab"
+                                                        aria-controls="nav-discharge1" aria-selected="false">
+                                                        Propustit ze služby
+                                                    </button>
+
+                                                </div>
+                                            </nav>
+                                            <div class="tab-content" id="nav-tabContent">
+                                                <div class="tab-pane fade show active" id="nav-recruit1" role="tabpanel"
+                                                    aria-labelledby="nav-recruit1-tab mt-2 mb-5">
+                                                    <div class="container">
+                                                        <div class="row justify-content-around mt-4">
+                                                            <div class="col-3">
+                                                                <b>Počet</b>
+                                                            </div>
+                                                            <div class="col-3">
+                                                                <b>Náklady</b>
+                                                            </div>
+                                                            <div class="col-3">
+                                                                <b>Čas</b>
+                                                            </div>
+                                                            <div class="col-3">
+                                                                
+                                                            </div>
+                                                        </div>
+                                                        <div class="row justify-content-around mt-2 mb-2">
+                                                            <div class="col-3">
+                                                                <input type="number" class="form-control" id="basic-url"
+                                                                    aria-describedby="basic-addon3" min="1">
+                                                            </div>
+                                                            <div class="col-3">
+                                                                4 <i class="fas fa-cube"
+                                                                    style="color: rgb(139, 126, 0);"></i> /
+                                                                1 <i class="fas fa-circle"
+                                                                    style="color: rgb(139, 126, 0);"></i>
+                                                            </div>
+                                                            <div class="col-3">
+                                                                00:06:36
+                                                            </div>
+                                                            <div class="col-3">
+                                                                <button class="btn btn-primary">OK</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane fade" id="nav-discharge1" role="tabpanel"
+                                                    aria-labelledby="nav-discharge1-tab">
+                                                    <div class="container">
+                                                        <div class="row justify-content-around mt-4">
+                                                            <div class="col-3">
+                                                                <b>Počet</b>
+                                                            </div>
+                                                            <div class="col-3">
+                                                                <b>Vrácení</b>
+                                                            </div>
+                                                            <div class="col-3">
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="row justify-content-around mt-2 mb-2">
+                                                            <div class="col-3">
+                                                                <input type="number" class="form-control" id="basic-url"
+                                                                    aria-describedby="basic-addon3" min="1">
+                                                            </div>
+                                                            <div class="col-3">
+                                                                3 <i class="fas fa-cube"
+                                                                    style="color: rgb(139, 126, 0);"></i>
+                                                            </div>
+                                                            <div class="col-3">
+                                                                <button class="btn btn-primary">OK</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Zavřít</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="row justify-content-around mb-2">
+                        <div class="col-2">
+                            Jezdec
+                        </div>
+                        <div class="col-2">
+                            0
+                        </div>
+                        <div class="col-2">
+                            10 <i class="fas fa-cube" style="color: rgb(139, 126, 0);"></i> /
+                            1 <i class="fas fa-circle" style="color: rgb(139, 126, 0);"></i>
+                        </div>
+                        <div class="col-2">
+                            00:13:36
+                        </div>
+                        <div class="col-2">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#horseModal">
+                                Rekrutovat
+                            </button>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="horseModal" tabindex="-1" aria-labelledby="horseModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="horseModalLabel">Jezdec</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <nav>
+                                                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+
+                                                    <button class="nav-link active" id="nav-recruit2-tab"
+                                                        data-bs-toggle="tab" data-bs-target="#nav-recruit2" type="button"
+                                                        role="tab" aria-controls="nav-recruit2" aria-selected="true">
+                                                        Rekrutovat
+                                                    </button>
+
+                                                    <button class="nav-link" id="nav-discharge2-tab" data-bs-toggle="tab"
+                                                        data-bs-target="#nav-discharge2" type="button" role="tab"
+                                                        aria-controls="nav-discharge2" aria-selected="false">
+                                                        Propustit ze služby
+                                                    </button>
+
+                                                </div>
+                                            </nav>
+                                            <div class="tab-content" id="nav-tabContent">
+                                                <div class="tab-pane fade show active" id="nav-recruit2" role="tabpanel"
+                                                    aria-labelledby="nav-recruit2-tab mt-2 mb-5">
+                                                    <div class="container">
+                                                        <div class="row justify-content-around mt-4">
+                                                            <div class="col-3">
+                                                                <b>Počet</b>
+                                                            </div>
+                                                            <div class="col-3">
+                                                                <b>Náklady</b>
+                                                            </div>
+                                                            <div class="col-3">
+                                                                <b>Čas</b>
+                                                            </div>
+                                                            <div class="col-3">
+                                                                
+                                                            </div>
+                                                        </div>
+                                                        <div class="row justify-content-around mt-2 mb-2">
+                                                            <div class="col-3">
+                                                                <input type="number" class="form-control" id="basic-url"
+                                                                    aria-describedby="basic-addon3" min="1">
+                                                            </div>
+                                                            <div class="col-3">
+                                                                10 <i class="fas fa-cube"
+                                                                    style="color: rgb(139, 126, 0);"></i> /
+                                                                1 <i class="fas fa-circle"
+                                                                    style="color: rgb(139, 126, 0);"></i>
+                                                            </div>
+                                                            <div class="col-3">
+                                                                00:13:36
+                                                            </div>
+                                                            <div class="col-3">
+                                                                <button class="btn btn-primary">OK</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane fade" id="nav-discharge2" role="tabpanel"
+                                                    aria-labelledby="nav-discharge2-tab">
+                                                    <div class="container">
+                                                        <div class="row justify-content-around mt-4">
+                                                            <div class="col-3">
+                                                                <b>Počet</b>
+                                                            </div>
+                                                            <div class="col-3">
+                                                                <b>Vrácení</b>
+                                                            </div>
+                                                            <div class="col-3">
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="row justify-content-around mt-2 mb-2">
+                                                            <div class="col-3">
+                                                                <input type="number" class="form-control" id="basic-url"
+                                                                    aria-describedby="basic-addon3" min="1">
+                                                            </div>
+                                                            <div class="col-3">
+                                                                3 <i class="fas fa-cube"
+                                                                    style="color: rgb(139, 126, 0);"></i>
+                                                            </div>
+                                                            <div class="col-3">
+                                                                <button class="btn btn-primary">OK</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Zavřít</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- old content -->
+                    <!-- <div class="row">
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card bg-primary text-white mb-4">
+                                    <div class="card-body">Primary Card</div>
+                                    <div class="card-footer d-flex align-items-center justify-content-between">
+                                        <a class="small text-white stretched-link" href="#">View Details</a>
+                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card bg-warning text-white mb-4">
+                                    <div class="card-body">Warning Card</div>
+                                    <div class="card-footer d-flex align-items-center justify-content-between">
+                                        <a class="small text-white stretched-link" href="#">View Details</a>
+                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card bg-success text-white mb-4">
+                                    <div class="card-body">Success Card</div>
+                                    <div class="card-footer d-flex align-items-center justify-content-between">
+                                        <a class="small text-white stretched-link" href="#">View Details</a>
+                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card bg-danger text-white mb-4">
+                                    <div class="card-body">Danger Card</div>
+                                    <div class="card-footer d-flex align-items-center justify-content-between">
+                                        <a class="small text-white stretched-link" href="#">View Details</a>
+                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xl-6">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <i class="fas fa-chart-area me-1"></i>
+                                        Area Chart Example
+                                    </div>
+                                    <div class="card-body"><canvas id="myAreaChart" width="100%" height="40"></canvas></div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <i class="fas fa-chart-bar me-1"></i>
+                                        Bar Chart Example
+                                    </div>
+                                    <div class="card-body"><canvas id="myBarChart" width="100%" height="40"></canvas></div>
+                                </div>
+                            </div>
+                        </div> -->
+                </div>
+            </main>
+            <footer class="py-2 mt-auto">
+                <div class="container-fluid px-4">
+                    <div class="d-flex align-items-center justify-content-between small">
+                        <div class="text-muted">Copyright &copy; Your Website 2021</div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+    <script src="js/scripts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
+    <script src="assets/demo/chart-area-demo.js"></script>
+    <script src="assets/demo/chart-bar-demo.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
+    <script src="js/datatables-simple-demo.js"></script>
+</body>
+
+</html>

@@ -1,6 +1,7 @@
 let data = [
     {
         name: "Hrad",
+        link: "castle",
         active: "false",
         level: 1,
         priceGold: 15,
@@ -10,6 +11,7 @@ let data = [
     },
     {
         name: "Zlatý důl",
+        link: "gold-mine",
         active: "false",
         level: 1,
         priceGold: 20,
@@ -19,6 +21,7 @@ let data = [
     },
     {
         name: "Kasárna",
+        link: "barracks",
         active: "false",
         level: 0,
         priceGold: 10,
@@ -28,6 +31,7 @@ let data = [
     },
     {
         name: "Mincovna",
+        link: "mint",
         active: "false",
         level: 0,
         priceGold: 28,
@@ -37,5 +41,5 @@ let data = [
     }
 ];
 let settings = {
-    activeLink: "index",
+    activeLink: "castle",
 };

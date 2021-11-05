@@ -84,6 +84,7 @@
                 <div class="container-fluid px-4">
                     <div class="d-flex align-items-center justify-content-between small">
                         <div class="text-muted">Copyright &copy; Your Website 2021</div>
+                        <span class="text-muted" style="margin-left: 1%; margin-top: 1%;"><small>Čas: <span id="serverTime"></span></small></span>
                     </div>
                 </div>
             </footer>
@@ -102,5 +103,6 @@
     window.addEventListener('DOMContentLoaded', event => {
         loadFile("castle", "content");
         loadNav();
+        serverTime();
     });
 </script>

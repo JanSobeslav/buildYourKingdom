@@ -11,14 +11,14 @@
     <link href="css/styles.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"
         crossorigin="anonymous"></script>
-        <script type="text/javascript" src="js/data.js"></script>
+    <script type="text/javascript" src="js/data.js"></script>
 </head>
 
 <body class="sb-nav-fixed">
     <script>console.log(data);</script>
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <!-- Navbar Brand-->
-        <a class="navbar-brand ps-3" href="index.html">Název města</a>
+        <a class="navbar-brand ps-3" onclick="location.reload();">Název města</a>
         <!-- Sidebar Toggle-->
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i
                 class="fas fa-bars"></i></button>
@@ -84,7 +84,8 @@
                 <div class="container-fluid px-4">
                     <div class="d-flex align-items-center justify-content-between small">
                         <div class="text-muted">Copyright &copy; Your Website 2021</div>
-                        <span class="text-muted" style="margin-left: 1%; margin-top: 1%;"><small>Čas: <span id="serverTime"></span></small></span>
+                        <span class="text-muted" style="margin-left: 1%; margin-top: 1%;"><small>Čas: <span
+                                    id="serverTime"></span></small></span>
                     </div>
                 </div>
             </footer>

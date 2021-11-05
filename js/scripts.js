@@ -12,7 +12,9 @@ function loadFile(name, el) {
   xhr.send(); 
   xhr.onreadystatechange = function(){ 
     if(xhr.readyState == 4 && xhr.status == 200){ 
-      document.getElementById(el).innerHTML = xhr.responseText; 
+      document.getElementById(el).innerHTML = xhr.responseText;
+      history.pushState({}, '', name);
+      //refresh page actions https://stackoverflow.com/questions/5004978/check-if-page-gets-reloaded-or-refreshed-in-javascript
     } 
   } 
 }
@@ -50,13 +52,8 @@ function formatTime(t) {
 }
 window.addEventListener('DOMContentLoaded', event => {
 
-    // Toggle the side navigation
     const sidebarToggle = document.body.querySelector('#sidebarToggle');
     if (sidebarToggle) {
-        // Uncomment Below to persist sidebar toggle between refreshes
-        // if (localStorage.getItem('sb|sidebar-toggle') === 'true') {
-        //     document.body.classList.toggle('sb-sidenav-toggled');
-        // }
         sidebarToggle.addEventListener('click', event => {
             event.preventDefault();
             document.body.classList.toggle('sb-sidenav-toggled');

@@ -13,23 +13,21 @@ function loadFile(name, el) {
   xhr.onreadystatechange = function(){ 
     if(xhr.readyState == 4 && xhr.status == 200){ 
       document.getElementById(el).innerHTML = xhr.responseText;
-      history.pushState({}, '', name);
-      //refresh page actions https://stackoverflow.com/questions/5004978/check-if-page-gets-reloaded-or-refreshed-in-javascript
     } 
   } 
 }
 
-function loadNav() {
+function loadNav(data) {
   let nav = document.getElementById("loadNav");
   let isActive;
   nav.innerHTML = "";
-  for (const i in data) {
-    if (data[i].link === settings.activeLink) {
+  for (const i of data.data) {
+    if (i.data.link === data.settings.activeLink) {
       isActive = "active";
     } else {
       isActive = "";
     }
-    nav.innerHTML += '<a class="nav-link ' + isActive + '" onclick="loadFile(\'' + data[i].link + '\', \'content\'); settings.activeLink = \'' + data[i].link + '\'; loadNav();"><div class="sb-nav-link-icon"><i class="' + data[i].icon + '"></i></div>' + data[i].name + '</a>'
+    nav.innerHTML += '<a class="nav-link ' + isActive + '" onclick="loadFile(\'' + i.link + '\', \'content\'); settings.activeLink = \'' + i.link + '\'; loadNav();" href="#/' + i.link + '"><div class="sb-nav-link-icon"><i class="' + i.icon + '"></i></div>' + i.name + '</a>'
   }
 }
 

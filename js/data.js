@@ -41,5 +41,12 @@ let data = [
     }
 ];
 let settings = {
+    townName: "Vesnice",
+    userName: "hráč 1245",
     activeLink: "castle",
 };
+
+export function getData() {
+    const d = {'data': data, 'settings': settings};
+    return d;
+} 

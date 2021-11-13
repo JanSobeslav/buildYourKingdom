@@ -12,17 +12,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"
         crossorigin="anonymous"></script>
     <script type="text/javascript" src="js/data.js"></script>
+    <script type="module" src="js/main.js"></script>
 </head>
 
 <body class="sb-nav-fixed">
-    <script>console.log(data);</script>
-    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-        <!-- Navbar Brand-->
+    <div id="root"></div>
+    <!-- <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark" style="visibility: hidden !important;">
         <a class="navbar-brand ps-3" onclick="location.reload();">Název města</a>
-        <!-- Sidebar Toggle-->
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i
                 class="fas fa-bars"></i></button>
-        <!-- Navbar-->
         <ul class="navbar-nav ms-auto ms-auto me-0 me-md-3 my-2 my-md-0 d-none d-md-inline-block form-inline">
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown"
@@ -37,7 +35,7 @@
                 </ul>
             </li>
         </ul>
-    </nav>
+    </nav> -->
     <div id="layoutSidenav">
         <div id="layoutSidenav_nav">
             <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
@@ -103,7 +101,6 @@
 <script>
     window.addEventListener('DOMContentLoaded', event => {
         loadFile("castle", "content");
-        loadNav();
         serverTime();
     });
 </script>

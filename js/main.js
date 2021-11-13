@@ -27,6 +27,6 @@ function createElement(tag, className) {
     return el;
 }
 function getElement(selector) {
-    const element = document.querySelector(selector);
+    const element = document.querySelector(selector); 
     return element;
 }

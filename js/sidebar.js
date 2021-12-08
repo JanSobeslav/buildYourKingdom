@@ -13,7 +13,6 @@ class Model {
 
      linkChange(link) {
          this.settings.activeLink = link;
-         console.log('ACTIVE_LINK:', this.settings.activeLink);
      }
 }
 
@@ -66,12 +65,20 @@ class View {
      }
 
      bindLinkChange(handler) {
-        for (const link of this._temporaryItemsLinks) {
-            const a = getElement('.' + link);
+        for (let link of this._temporaryItemsLinks) {
+            let a = getElement('.' + link);
             a.addEventListener('click', event => {
+            let aLinks = document.getElementsByTagName('a');
+            for (let aL of aLinks) {
+                aL.classList.remove("active");
+            } 
             if (event.target.className === ('nav-link ' + link)) {
-                this.menu.innerHTML = '';
+                //this.menu.innerHTML = '';
+                a.classList.add("active");
+                console.log(a);
                 handler(link);
+            } else {
+                a.classList.remove("active");
             }
           });
         }
@@ -95,8 +102,7 @@ class Controller {
 
     handleLinkChange = (link) => {
         this.model.linkChange(link);
-        console.log(link);
-        this.onMenuItemsChange(this.model.data, this.model.settings);
+        //this.onMenuItemsChange(this.model.data, this.model.settings);
     }
 }
 

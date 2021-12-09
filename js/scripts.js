@@ -6,30 +6,6 @@
 // 
 // Scripts
 // 
-function loadFile(name, el) {
-  let xhr = new XMLHttpRequest(); 
-  xhr.open("GET", (name + ".html"), true); 
-  xhr.send(); 
-  xhr.onreadystatechange = function(){ 
-    if(xhr.readyState == 4 && xhr.status == 200){ 
-      document.getElementById(el).innerHTML = xhr.responseText;
-    } 
-  } 
-}
-
-function loadNav(data) {
-  let nav = document.getElementById("loadNav");
-  let isActive;
-  nav.innerHTML = "";
-  for (const i of data.data) {
-    if (i.data.link === data.settings.activeLink) {
-      isActive = "active";
-    } else {
-      isActive = "";
-    }
-    nav.innerHTML += '<a class="nav-link ' + isActive + '" onclick="loadFile(\'' + i.link + '\', \'content\'); settings.activeLink = \'' + i.link + '\'; loadNav();" href="#/' + i.link + '"><div class="sb-nav-link-icon"><i class="' + i.icon + '"></i></div>' + i.name + '</a>'
-  }
-}
 
 function serverTime() {
   const today = new Date();

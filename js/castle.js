@@ -88,6 +88,8 @@ class View {
     }
 
     displayBuildings(data) {
+        let i = data.findIndex(data => data.link === 'castle');
+        this.h1.textContent = data[i].name;
         let tpcRowHeader = createElement('div', ['row', 'justify-content-around', 'mb-4']);
         tpcRowHeader.innerHTML = `
         <div class="col-2">

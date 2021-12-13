@@ -1,6 +1,7 @@
 import { createElement, getElement } from "./elements.js";
 import { getData } from "./data.js";
 import { buildCastle as castle } from "./castle.js";
+import { buildGoldMine as mine } from "./gold-mine.js";
 
 class Model {
     constructor(data) {
@@ -94,13 +95,23 @@ class View {
                     }
                     a.classList.add("active");
                     handler(link);
-                    castle(('#' + content.id), getData());
+                    this.displayContent(link, content.id);
                 } else {
                     a.classList.remove("active");
                 }
             });
         }
+    }
 
+    displayContent(link, id) {
+        switch (link) {
+            case 'castle':
+                castle(('#' + id), getData());
+                break;
+            case 'gold-mine':
+                mine(('#' + id), getData());
+                break;
+        }
     }
 }
 

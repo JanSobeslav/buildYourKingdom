@@ -71,6 +71,7 @@ class View {
             this.menu.append(a);
             this._initItemsLink(d.link);
         }
+        this.displayContent('castle', 'content');
     }
 
     bindLinkChange(handler) {

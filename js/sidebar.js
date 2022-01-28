@@ -3,6 +3,7 @@ import { getData } from "./data.js";
 import { buildCastle as castle } from "./castle.js";
 import { buildGoldMine as mine } from "./gold-mine.js";
 import { buildBarracks as barracks } from "./barracks.js";
+import { buildMint as mint } from "./mint.js";
 
 class Model {
     constructor(data) {
@@ -115,6 +116,9 @@ class View {
                 break;
             case 'barracks':
                 barracks(('#' + id), getData());
+                break;
+            case 'mint':
+                mint(('#' + id), getData());
                 break;
         }
     }

@@ -42,7 +42,7 @@ let data = [
             {
                 name: "Lukostřelec",
                 link: "archer",
-                priceGold: 5,
+                priceGold: 6,
                 priceCoins: 1,
                 time: 556,
                 attack: 2,
@@ -69,7 +69,11 @@ let data = [
         priceGold: 28,
         priceCoins: 3,
         time: 10, //ČAS ZJISTIT
-        icon: "fas fa-coins"
+        icon: "fas fa-coins",
+        coin: {
+            time: 1541,
+            price: 10
+        }
     }
 ];
 let settings = {

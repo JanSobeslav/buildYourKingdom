@@ -2565,7 +2565,7 @@ textarea.form-control-lg {
 }
 
 .form-range {
-  width: 100%;
+  width: 60%;
   height: 1.5rem;
   padding: 0;
   background-color: transparent;

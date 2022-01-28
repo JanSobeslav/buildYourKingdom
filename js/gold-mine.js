@@ -18,7 +18,8 @@ class View {
 
         this.container = createElement('div', ['container-fluid', 'px-4']);
 
-        this.h1Title = createElement('h1', ['mt-4']);
+        this.h1Title = createElement('h1', ['mt-4', 'mb-4']);
+        this.hr = createElement('hr');
 
         // <button type="button" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="right"
         // style="background-color: transparent; border: solid transparent;" data-bs-content="Ve tvém okolí se nachází zlatý důl, ve kterém těžíš zlaté valouny. 
@@ -45,7 +46,7 @@ class View {
 
         this.nextLevel.append(this.nlTitle, this.nlStatus);
 
-        this.container.append(this.h1Title, this.actualLevel, this.nextLevel);
+        this.container.append(this.h1Title, this.hr, this.actualLevel, this.nextLevel);
 
         this.app.append(this.container);
     }

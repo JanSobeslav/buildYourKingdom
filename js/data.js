@@ -27,7 +27,39 @@ let data = [
         priceGold: 10,
         priceCoins: 1,
         time: 10, //ČAS ZJISTIT
-        icon: "fas fa-chess-rook"
+        icon: "fas fa-chess-rook",
+        soldiers_type: [
+            {
+                name: "Šermíř",
+                link: "swordsman",
+                priceGold: 5,
+                priceCoins: 1,
+                time: 516,
+                attack: 3,
+                defence: 3,
+                icon: "fas fa-chess-pawn"
+            },
+            {
+                name: "Lukostřelec",
+                link: "archer",
+                priceGold: 5,
+                priceCoins: 1,
+                time: 556,
+                attack: 2,
+                defence: 5,
+                icon: "fas fa-bullseye"
+            },
+            {
+                name: "Jezdec",
+                link: "horseman",
+                priceGold: 9,
+                priceCoins: 2,
+                time: 846,
+                attack: 6,
+                defence: 4,
+                icon: "fas fa-horse-head"
+            }
+        ],
     },
     {
         name: "Mincovna",

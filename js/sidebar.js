@@ -2,6 +2,7 @@ import { createElement, getElement } from "./elements.js";
 import { getData } from "./data.js";
 import { buildCastle as castle } from "./castle.js";
 import { buildGoldMine as mine } from "./gold-mine.js";
+import { buildBarracks as barracks } from "./barracks.js";
 
 class Model {
     constructor(data) {
@@ -111,6 +112,9 @@ class View {
                 break;
             case 'gold-mine':
                 mine(('#' + id), getData());
+                break;
+            case 'barracks':
+                barracks(('#' + id), getData());
                 break;
         }
     }

@@ -6,7 +6,7 @@ let data = [
         level: 1,
         priceGold: 15,
         priceCoins: 1,
-        time: 10, //ČAS ZJISTIT
+        time: 25, //ČAS ZJISTIT
         icon: "fab fa-fort-awesome-alt"
     },
     {
@@ -16,7 +16,7 @@ let data = [
         level: 1,
         priceGold: 20,
         priceCoins: 2,
-        time: 10, //ČAS ZJISTIT
+        time: 40, //ČAS ZJISTIT
         icon: "fas fa-cubes"
     },
     {
@@ -26,7 +26,7 @@ let data = [
         level: 0,
         priceGold: 10,
         priceCoins: 1,
-        time: 10, //ČAS ZJISTIT
+        time: 19, //ČAS ZJISTIT
         icon: "fas fa-chess-rook",
         soldiers_type: [
             {
@@ -68,7 +68,7 @@ let data = [
         level: 0,
         priceGold: 28,
         priceCoins: 3,
-        time: 10, //ČAS ZJISTIT
+        time: 120, //ČAS ZJISTIT
         icon: "fas fa-coins",
         coin: {
             time: 1541,

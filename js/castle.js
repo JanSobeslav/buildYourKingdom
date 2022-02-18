@@ -109,8 +109,10 @@ class View {
         </div>
         `;
         this.tabPaneContBuildings.append(tpcRowHeader);
+        let castleLevel = 0;
         for (let budova of data) {
             let row = createElement('div', ['row', 'justify-content-around', 'mb-2']);
+            if (budova.link === 'castle') castleLevel = budova.level;
             row.innerHTML = `
             <div class="col-2">
                 <i class="${budova.icon}"></i> ${budova.name}
@@ -123,7 +125,7 @@ class View {
                 ${budova.priceCoins} <i class="fas fa-circle" style="color: rgb(139, 126, 0);"></i>
             </div>
             <div class="col-2">
-                ${budova.time}
+                ${this.displayBuildTime((budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3)))}
             </div>
             <div class="col-2">
                 <button id="level-${budova.link}" class="btn btn-primary">Level ${budova.level + 1}</button>
@@ -138,6 +140,19 @@ class View {
             });
         }
 
+    }
+
+    displayBuildTime(t) {
+        if (t <= 15) t = 15;
+        const sec = parseInt(t, 10); // convert value to number if it's string
+    let hours   = Math.floor(sec / 3600); // get hours
+    let minutes = Math.floor((sec - (hours * 3600)) / 60); // get minutes
+    let seconds = sec - (hours * 3600) - (minutes * 60); //  get seconds
+    // add 0 if value < 10; Example: 2 => 02
+    if (hours   < 10) {hours   = "0"+hours;}
+    if (minutes < 10) {minutes = "0"+minutes;}
+    if (seconds < 10) {seconds = "0"+seconds;}
+    return hours+':'+minutes+':'+seconds; // Return is HH : MM : SS
     }
 }
 

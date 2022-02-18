@@ -59,13 +59,13 @@ class View {
 
         this.acTitle.innerHTML += ` (Level ${data[i].level})`;
         this.acStatus.innerHTML += `
-        Počet vytěženého zlata: <b>${1 * data[i].level}</b> <i class="fas fa-circle" style="color: rgb(139, 126, 0);"></i> <b>/
+        Počet vytěženého zlata: <b>${1 * (Math.pow(data[i].level, 2))}</b> <i class="fas fa-circle" style="color: rgb(139, 126, 0);"></i> <b>/
         hodina</b>
         `;
 
         this.nlTitle.innerHTML += ` (Level ${data[i].level + 1})`;
         this.nlStatus.innerHTML += `
-        Počet vytěženého zlata: <b style="color: darkgreen;">${1 * (data[i].level + 1)}</b> <i class="fas fa-circle"
+        Počet vytěženého zlata: <b style="color: darkgreen;">${1 * (Math.pow((data[i].level + 1) , 2))}</b> <i class="fas fa-circle"
         style="color: rgb(139, 126, 0);"></i> <b>/ hodina</b>
         `;
     }

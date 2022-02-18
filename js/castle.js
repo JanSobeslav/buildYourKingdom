@@ -126,11 +126,16 @@ class View {
                 ${budova.time}
             </div>
             <div class="col-2">
-                <button class="btn btn-primary">Level 2</button>
+                <button id="level-${budova.link}" class="btn btn-primary">Level ${budova.level + 1}</button>
             </div>
             `;
-            //@ToDo - zprovoznit button
             this.tabPaneContBuildings.append(row);
+
+            document.getElementById("level-" + budova.link).addEventListener('click', () => {
+                budova.level++;
+                this.tabPaneContBuildings.innerHTML = '';
+                this.displayBuildings(data);
+            });
         }
 
     }

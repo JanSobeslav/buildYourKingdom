@@ -71,7 +71,7 @@ class View {
         this.tabPaneContBuildings = createElement('div', ['container', 'mt-4', 'ml-4']);
 
         //generuje se v displayBuildings
-        
+
         this.tabPane.append(this.tabPaneContBuildings);
 
         this.tabPane2 = createElement('div', ['tab-pane', 'fade', 'show']);
@@ -124,7 +124,7 @@ class View {
                 ${budova.priceGold} <i class="fas fa-cube" style="color: rgb(139, 126, 0);"></i> /
                 ${budova.priceCoins} <i class="fas fa-circle" style="color: rgb(139, 126, 0);"></i>
             </div>
-            <div class="col-2">
+            <div class="col-2" id="time-${budova.link}">
                 ${displayBuildTime((budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3)))}
             </div>
             <div class="col-2">
@@ -134,9 +134,21 @@ class View {
             this.tabPaneContBuildings.append(row);
 
             document.getElementById("level-" + budova.link).addEventListener('click', () => {
-                budova.level++;
-                this.tabPaneContBuildings.innerHTML = '';
-                this.displayBuildings(data);
+                let btnLevel = getElement('#level-' + budova.link);
+                btnLevel.disabled = true;
+                btnLevel.innerHTML = `Level ${budova.level + 2}`;
+                let time = budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3);
+                const countdown = setInterval(() => {
+                    getElement('#time-' + budova.link).innerHTML = displayBuildTime(time);
+                    time--;
+                    if (time < 0) {
+                        budova.level++;
+                        this.tabPaneContBuildings.innerHTML = '';
+                        this.displayBuildings(data);
+                        getElement('#level-' + budova.link).disabled = false;
+                        clearInterval(countdown);
+                    }
+                }, 1000);
             });
         }
 

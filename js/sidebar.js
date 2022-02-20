@@ -1,4 +1,4 @@
-import { createElement, getElement } from "./glMethods.js";
+import { createElement, getElement, serverTime } from "./glMethods.js";
 import { getData } from "./data.js";
 import { buildCastle as castle } from "./castle.js";
 import { buildGoldMine as mine } from "./gold-mine.js";
@@ -46,7 +46,12 @@ class View {
         this.side_content.id = 'layoutSidenav_content';
         this.contentMain = createElement('main');
         this.contentMain.id = 'content';
-        this.side_content.append(this.contentMain);
+
+        this.svTime = createElement('span', ['text-muted']);
+        this.svTime.setAttribute('style', 'margin-left: 1%; margin-top: 1%;');
+        this.svTime.innerHTML = `<small>Čas: <span id="serverTime"></span></small>`;
+
+        this.side_content.append(this.contentMain, this.svTime);
         this.sidenav.append(this.side_nav, this.side_content);
         //
 
@@ -74,6 +79,7 @@ class View {
             this._initItemsLink(d.link);
         }
         this.displayContent('castle', 'content', data[0]);
+        getElement('#serverTime').innerHTML = serverTime();
     }
 
     bindLinkChange(handler, data) {

@@ -1,4 +1,4 @@
-import { getElement, createElement } from "./glMethods.js";
+import { getElement, createElement, serverTime } from "./glMethods.js";
 
 class Model {
     constructor(data) {

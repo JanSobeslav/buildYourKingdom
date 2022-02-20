@@ -128,18 +128,21 @@ class View {
                 ${displayBuildTime((budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3)))}
             </div>
             <div class="col-2">
-                <button id="level-${budova.link}" class="btn btn-primary">Level ${budova.level + 1}</button>
+                <button id="level-${budova.link}" class="btn btn-primary upgrade">${budova.level == 0 ? 'Postavit' : 'Level ' + (budova.level + 1)}</button>
             </div>
             `;
             this.tabPaneContBuildings.append(row);
 
             document.getElementById("level-" + budova.link).addEventListener('click', () => {
                 let btnLevel = getElement('#level-' + budova.link);
-                btnLevel.disabled = true;
+                let btnsLevel = document.getElementsByClassName('upgrade');
+                for (const btn of btnsLevel) {
+                    btn.disabled = true;
+                }
                 btnLevel.innerHTML = `Level ${budova.level + 2}`;
                 let time = budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3);
                 const countdown = setInterval(() => {
-                    getElement('#time-' + budova.link).innerHTML = displayBuildTime(time);
+                    getElement('#time-' + budova.link).innerHTML = `<strong style="color: darkgreen;">${displayBuildTime(time)}</strong>`;
                     time--;
                     if (time < 0) {
                         budova.level++;

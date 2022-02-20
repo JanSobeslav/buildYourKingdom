@@ -7,23 +7,6 @@
 // Scripts
 // 
 
-function serverTime() {
-  const today = new Date();
-  let h = today.getHours();
-  let m = today.getMinutes();
-  let s = today.getSeconds();
-  m = formatTime(m);
-  s = formatTime(s);
-  document.getElementById('serverTime').innerHTML =  h + ":" + m + ":" + s;
-  setTimeout(serverTime, 100);
-}
-
-function formatTime(t) {
-  if (t < 10) {
-    t = "0" + t;
-  }
-  return t;
-}
 window.addEventListener('DOMContentLoaded', event => {
 
     const sidebarToggle = document.body.querySelector('#sidebarToggle');

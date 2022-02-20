@@ -73,10 +73,10 @@ class View {
             this.menu.append(a);
             this._initItemsLink(d.link);
         }
-        this.displayContent('castle', 'content');
+        this.displayContent('castle', 'content', data[0]);
     }
 
-    bindLinkChange(handler) {
+    bindLinkChange(handler, data) {
         //projde linky v _temporaryItemsLinks
         for (let link of this._temporaryItemsLinks) {
             //najde konkrétní link s třídou
@@ -98,7 +98,8 @@ class View {
                     }
                     a.classList.add("active");
                     handler(link);
-                    this.displayContent(link, content.id);
+                    const building = data.filter(b => {if (b.link === link) return b;});
+                    this.displayContent(link, content.id, building[0]);
                 } else {
                     a.classList.remove("active");
                 }
@@ -106,20 +107,24 @@ class View {
         }
     }
 
-    displayContent(link, id) {
-        switch (link) {
-            case 'castle':
-                castle(('#' + id), getData());
-                break;
-            case 'gold-mine':
-                mine(('#' + id), getData());
-                break;
-            case 'barracks':
-                barracks(('#' + id), getData());
-                break;
-            case 'mint':
-                mint(('#' + id), getData());
-                break;
+    displayContent(link, id, building) {
+        if (building.level > 0) {
+            switch (link) {
+                case 'castle':
+                    castle(('#' + id), getData());
+                    break;
+                case 'gold-mine':
+                    mine(('#' + id), getData());
+                    break;
+                case 'barracks':
+                    barracks(('#' + id), getData());
+                    break;
+                case 'mint':
+                    mint(('#' + id), getData());
+                    break;
+            }
+        } else {
+            getElement('#' + id).innerHTML = `<h2 class="display-4 m-5">Budova ještě nebyla postavena!</h2>`;
         }
     }
 }
@@ -131,7 +136,7 @@ class Controller {
 
         this.model.bindMenuItemsChange(this.onMenuItemsChange);
         this.onMenuItemsChange(this.model.data, this.model.settings);
-        this.view.bindLinkChange(this.handleLinkChange);
+        this.view.bindLinkChange(this.handleLinkChange, this.model.data);
     }
 
     onMenuItemsChange = (data, settings) => {

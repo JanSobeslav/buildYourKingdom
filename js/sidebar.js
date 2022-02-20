@@ -1,4 +1,4 @@
-import { createElement, getElement } from "./elements.js";
+import { createElement, getElement } from "./glMethods.js";
 import { getData } from "./data.js";
 import { buildCastle as castle } from "./castle.js";
 import { buildGoldMine as mine } from "./gold-mine.js";

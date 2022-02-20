@@ -1,4 +1,4 @@
-import { createElement, getElement } from "./elements.js";
+import { displayBuildTime, createElement, getElement } from "./glMethods.js";
 
 class Model {
     constructor(data) {
@@ -64,7 +64,7 @@ class View {
             1
         </div>
         <div class="col-2" id="coinTime">
-            ${this.displayBuildTime(data[i].coin.time - (Math.pow(data[i].level, 3)))}
+            ${displayBuildTime(data[i].coin.time - (Math.pow(data[i].level, 3)))}
         </div>
         <div class="col-2" id="coinPrice">
             ${data[i].coin.price}
@@ -79,14 +79,14 @@ class View {
             <div class="col">
                 Vyražené mince: <b>1</b> <i class="fas fa-circle"
                     style="color: rgb(139, 126, 0);"></i> za <b style="color: darkgreen;">
-                    ${this.displayBuildTime(data[i].coin.time - (Math.pow(data[i].level + 1, 3)))}</b>
+                    ${displayBuildTime(data[i].coin.time - (Math.pow(data[i].level + 1, 3)))}</b>
             </div>
         `;
 
         let input = getElement('#coinsRangeInput');
         input.addEventListener('change', (event) => {
             let input_value = event.target.value;
-            getElement('#coinTime').innerHTML = this.displayBuildTime((data[i].coin.time - (data[i].level * 0.5)) * input_value);
+            getElement('#coinTime').innerHTML = displayBuildTime((data[i].coin.time - (data[i].level * 0.5)) * input_value);
             getElement('#coinPrice').innerHTML = (data[i].coin.price) * input_value;
             getElement('#coins').innerHTML = input_value;
             // this.coinPriceChange(data, uData, parseInt(input_value));
@@ -99,19 +99,6 @@ class View {
         data[i].coin.time = uData[i].coin.time * count;
         this.displayCoins(data, uData, count);
     }
-
-    displayBuildTime(t) {
-        const sec = parseInt(t, 10); // convert value to number if it's string
-    let hours   = Math.floor(sec / 3600); // get hours
-    let minutes = Math.floor((sec - (hours * 3600)) / 60); // get minutes
-    let seconds = sec - (hours * 3600) - (minutes * 60); //  get seconds
-    // add 0 if value < 10; Example: 2 => 02
-    if (hours   < 10) {hours   = "0"+hours;}
-    if (minutes < 10) {minutes = "0"+minutes;}
-    if (seconds < 10) {seconds = "0"+seconds;}
-    return hours+':'+minutes+':'+seconds; // Return is HH : MM : SS
-    }
-
 }
 
 class Controller {

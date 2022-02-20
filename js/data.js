@@ -85,4 +85,4 @@ let settings = {
 export function getData() {
     const d = {'data': data, 'settings': settings};
     return d;
-} 
+}

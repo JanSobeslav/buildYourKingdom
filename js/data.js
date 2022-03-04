@@ -7,7 +7,8 @@ let data = [
         priceGold: 15,
         priceCoins: 1,
         time: 25, //ČAS ZJISTIT
-        icon: "fab fa-fort-awesome-alt"
+        finishDateTime: "",
+        icon: "fab fa-fort-awesome-alt",
     },
     {
         name: "Zlatý důl",
@@ -17,6 +18,7 @@ let data = [
         priceGold: 20,
         priceCoins: 2,
         time: 40, //ČAS ZJISTIT
+        finishDateTime: "",
         icon: "fas fa-cubes"
     },
     {
@@ -27,6 +29,7 @@ let data = [
         priceGold: 10,
         priceCoins: 1,
         time: 19, //ČAS ZJISTIT
+        finishDateTime: "",
         icon: "fas fa-chess-rook",
         soldiers_type: [
             {
@@ -37,6 +40,7 @@ let data = [
                 time: 516,
                 attack: 3,
                 defence: 3,
+                finishDateTime: "",
                 icon: "fas fa-chess-pawn"
             },
             {
@@ -47,6 +51,7 @@ let data = [
                 time: 556,
                 attack: 2,
                 defence: 5,
+                finishDateTime: "",
                 icon: "fas fa-bullseye"
             },
             {
@@ -57,6 +62,7 @@ let data = [
                 time: 846,
                 attack: 6,
                 defence: 4,
+                finishDateTime: "",
                 icon: "fas fa-horse-head"
             }
         ],
@@ -69,6 +75,7 @@ let data = [
         priceGold: 28,
         priceCoins: 3,
         time: 120, //ČAS ZJISTIT
+        finishDateTime: "",
         icon: "fas fa-coins",
         coin: {
             time: 1541,
@@ -80,6 +87,8 @@ let settings = {
     townName: "Vesnice",
     userName: "hráč 1245",
     activeLink: "castle",
+    activeBuildState: false,
+    buildingUpgradingState: ""
 };
 
 export function getData() {

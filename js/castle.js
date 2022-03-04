@@ -10,6 +10,11 @@ class Model {
     bindDisplayBuildings(callback) {
         this.onDisplayBuildings(callback);
     }
+
+    bindActiveBuildState(state, building) {
+        this.settings.activeBuildState = state;
+        this.settings.buildingUpgradingState = building;
+    }
 }
 
 class View {
@@ -17,6 +22,7 @@ class View {
         this.app = getElement(elName);
 
         this.container = createElement('div', ['container-fluid', 'px-4']);
+        this.container.id = "container-castle";
 
         this.h1 = createElement('h1', ['mt-4']);
 
@@ -87,7 +93,7 @@ class View {
         this.app.append(this.container);
     }
 
-    displayBuildings(data) {
+    displayBuildings(activeBuildStateHandler, data, settings) {
         let i = data.findIndex(data => data.link === 'castle');
         this.h1.textContent = data[i].name;
         let tpcRowHeader = createElement('div', ['row', 'justify-content-around', 'mb-4']);
@@ -128,15 +134,18 @@ class View {
                 ${displayBuildTime((budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3)))}
             </div>
             <div class="col-2">
-                <button id="level-${budova.link}" class="btn btn-primary upgrade">${budova.level == 0 ? 'Postavit' : 'Level ' + (budova.level + 1)}</button>
+                <button id="level-${budova.link}" ${settings.activeBuildState && 'disabled'} class="btn btn-primary upgrade">
+                ${(budova.level == 0 && settings.activeBuildState == false) ? 'Postavit' : ((settings.activeBuildState && settings.buildingUpgradingState == budova.link) ? 'Level ' + (budova.level + 2) : 'Level ' + (budova.level + 1))}</button>
             </div>
             `;
             this.tabPaneContBuildings.append(row);
 
             document.getElementById("level-" + budova.link).addEventListener('click', () => {
+                activeBuildStateHandler(true, budova.link);
                 let btnLevel = getElement('#level-' + budova.link);
                 let btnsLevel = document.getElementsByClassName('upgrade');
                 for (const btn of btnsLevel) {
+                    
                     btn.disabled = true;
                 }
                 btnLevel.innerHTML = `Level ${budova.level + 2}`;
@@ -147,9 +156,10 @@ class View {
                     if (time < 0) {
                         budova.level++;
                         this.tabPaneContBuildings.innerHTML = '';
-                        this.displayBuildings(data);
-                        getElement('#level-' + budova.link).disabled = false;
+                        activeBuildStateHandler(false, "");
                         clearInterval(countdown);
+                        this.app.innerHTML = "";
+                        buildCastle('#content', {data: data, settings: settings});
                     }
                 }, 1000);
             });
@@ -160,14 +170,18 @@ class View {
 
 class Controller {
     constructor(model, view) {
-        this.model = model
-        this.view = view
+        this.model = model;
+        this.view = view;
 
-        this.onDisplayBuildings(this.model.data);
+        this.onDisplayBuildings(this.handleActiveBuildState, this.model.data, this.model.settings);
     }
 
-    onDisplayBuildings = (data) => {
-        this.view.displayBuildings(data);
+    onDisplayBuildings = (handler, data, settings) => {
+        this.view.displayBuildings(handler, data, settings);
+    }
+
+    handleActiveBuildState = (state, building) => {
+        this.model.bindActiveBuildState(state, building);
     }
 }
 

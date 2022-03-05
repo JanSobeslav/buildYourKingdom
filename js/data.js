@@ -88,7 +88,9 @@ let settings = {
     userName: "hráč 1245",
     activeLink: "castle",
     activeBuildState: false,
-    buildingUpgradingState: ""
+    buildingUpgradingState: "",
+    gold: 60,
+    coins: 0
 };
 
 export function getData() {

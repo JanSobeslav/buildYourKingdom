@@ -15,6 +15,17 @@ class Model {
         this.settings.activeBuildState = state;
         this.settings.buildingUpgradingState = building;
     }
+
+    bindFinishTimeState(time, link) {
+        const index = this.data.findIndex(b => b.link === link);
+        if (time !== "") {
+            let date = new Date();
+            date.setSeconds(date.getSeconds() + time);
+            this.data[index].finishDateTime = date;
+        } else {
+            this.data[index].finishDateTime = "";
+        }
+    }
 }
 
 class View {
@@ -93,7 +104,7 @@ class View {
         this.app.append(this.container);
     }
 
-    displayBuildings(activeBuildStateHandler, data, settings) {
+    displayBuildings(activeBuildStateHandler, finishTimeHandler, data, settings) {
         let i = data.findIndex(data => data.link === 'castle');
         this.h1.textContent = data[i].name;
         let tpcRowHeader = createElement('div', ['row', 'justify-content-around', 'mb-4']);
@@ -142,26 +153,35 @@ class View {
 
             document.getElementById("level-" + budova.link).addEventListener('click', () => {
                 activeBuildStateHandler(true, budova.link);
+                
                 let btnLevel = getElement('#level-' + budova.link);
                 let btnsLevel = document.getElementsByClassName('upgrade');
+                
                 for (const btn of btnsLevel) {
-                    
                     btn.disabled = true;
                 }
+
                 btnLevel.innerHTML = `Level ${budova.level + 2}`;
+
                 let time = budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3);
+                finishTimeHandler(time, budova.link);
+
                 const countdown = setInterval(() => {
-                    getElement('#time-' + budova.link).innerHTML = `<strong style="color: darkgreen;">${displayBuildTime(time)}</strong>`;
-                    time--;
-                    if (time < 0) {
+                    let bTime = displayBuildTime(time, budova.finishDateTime);
+                    let timeElement = getElement('#time-' + budova.link);
+
+                    if (timeElement) timeElement.innerHTML = `<strong style="color: darkgreen;">${bTime}</strong>`;
+                    
+                    if (bTime == "Stavba dokončena") {
                         budova.level++;
-                        this.tabPaneContBuildings.innerHTML = '';
                         activeBuildStateHandler(false, "");
+                        finishTimeHandler("", budova.link);
                         clearInterval(countdown);
                         this.app.innerHTML = "";
-                        buildCastle('#content', {data: data, settings: settings});
+                        buildCastle('#content', { data: data, settings: settings });
                     }
                 }, 1000);
+
             });
         }
 
@@ -173,15 +193,19 @@ class Controller {
         this.model = model;
         this.view = view;
 
-        this.onDisplayBuildings(this.handleActiveBuildState, this.model.data, this.model.settings);
+        this.onDisplayBuildings(this.handleActiveBuildState, this.finishTimeHandler, this.model.data, this.model.settings);
     }
 
-    onDisplayBuildings = (handler, data, settings) => {
-        this.view.displayBuildings(handler, data, settings);
+    onDisplayBuildings = (activeBuildStateHandler, finishTimeHandler, data, settings) => {
+        this.view.displayBuildings(activeBuildStateHandler, finishTimeHandler, data, settings);
     }
 
     handleActiveBuildState = (state, building) => {
         this.model.bindActiveBuildState(state, building);
+    }
+
+    finishTimeHandler = (dateTime, link) => {
+        this.model.bindFinishTimeState(dateTime, link);
     }
 }
 

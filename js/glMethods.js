@@ -1,4 +1,12 @@
-export function displayBuildTime(t) {
+export function displayBuildTime(t, date = null) {
+    if (date !== null) {
+        let currentDate = new Date();
+        let buildDate = new Date(date);
+        t = (buildDate - currentDate) / 1000;
+        if (buildDate <= currentDate) {
+            return "Stavba dokončena";
+        }
+    }
     const sec = parseInt(t, 10); // convert value to number if it's string
     let hours = Math.floor(sec / 3600); // get hours
     let minutes = Math.floor((sec - (hours * 3600)) / 60); // get minutes
@@ -9,6 +17,7 @@ export function displayBuildTime(t) {
     if (seconds < 10) { seconds = "0" + seconds; }
     return hours + ':' + minutes + ':' + seconds; // Return is HH : MM : SS
 }
+
 export function createElement(tag, className) {
     const el = document.createElement(tag);
     if (className) {
@@ -18,10 +27,12 @@ export function createElement(tag, className) {
     }
     return el;
 }
+
 export function getElement(selector) {
     const el = document.querySelector(selector);
     return el;
 }
+
 export function serverTime() {
     const today = new Date();
     let h = today.getHours();
@@ -29,13 +40,13 @@ export function serverTime() {
     let s = today.getSeconds();
     m = formatTime(m);
     s = formatTime(s);
-    document.getElementById('serverTime').innerHTML =  h + ":" + m + ":" + s;
+    document.getElementById('serverTime').innerHTML = h + ":" + m + ":" + s;
     setTimeout(serverTime, 100);
-  }
-  
-  function formatTime(t) {
+}
+
+function formatTime(t) {
     if (t < 10) {
-      t = "0" + t;
+        t = "0" + t;
     }
     return t;
-  }
+}

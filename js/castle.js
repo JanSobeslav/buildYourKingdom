@@ -1,4 +1,5 @@
 import { displayBuildTime, createElement, getElement } from "./glMethods.js";
+import { buildNavigation as nav } from "./navigation.js";
 
 class Model {
     constructor(data) {
@@ -25,6 +26,10 @@ class Model {
         } else {
             this.data[index].finishDateTime = "";
         }
+    }
+
+    bindDicreaseGold(gold) {
+        this.settings.gold -= gold;
     }
 }
 
@@ -104,7 +109,7 @@ class View {
         this.app.append(this.container);
     }
 
-    displayBuildings(activeBuildStateHandler, finishTimeHandler, data, settings) {
+    displayBuildings(activeBuildStateHandler, finishTimeHandler, dicreaseGoldHandler, data, settings) {
         let i = data.findIndex(data => data.link === 'castle');
         this.h1.textContent = data[i].name;
         let tpcRowHeader = createElement('div', ['row', 'justify-content-around', 'mb-4']);
@@ -152,35 +157,48 @@ class View {
             this.tabPaneContBuildings.append(row);
 
             document.getElementById("level-" + budova.link).addEventListener('click', () => {
-                activeBuildStateHandler(true, budova.link);
-                
-                let btnLevel = getElement('#level-' + budova.link);
-                let btnsLevel = document.getElementsByClassName('upgrade');
-                
-                for (const btn of btnsLevel) {
-                    btn.disabled = true;
-                }
+                if (budova.priceGold < settings.gold) {
+                    dicreaseGoldHandler(budova.priceGold);
 
-                btnLevel.innerHTML = `Level ${budova.level + 2}`;
+                    getElement('#game-navigation').innerHTML = '';
+                    nav('#game-navigation', {data: data, settings: settings});
 
-                let time = budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3);
-                finishTimeHandler(time, budova.link);
+                    activeBuildStateHandler(true, budova.link);
 
-                const countdown = setInterval(() => {
-                    let bTime = displayBuildTime(time, budova.finishDateTime);
-                    let timeElement = getElement('#time-' + budova.link);
+                    let btnLevel = getElement('#level-' + budova.link);
+                    let btnsLevel = document.getElementsByClassName('upgrade');
 
-                    if (timeElement) timeElement.innerHTML = `<strong style="color: darkgreen;">${bTime}</strong>`;
-                    
-                    if (bTime == "Stavba dokončena") {
-                        budova.level++;
-                        activeBuildStateHandler(false, "");
-                        finishTimeHandler("", budova.link);
-                        clearInterval(countdown);
-                        this.app.innerHTML = "";
-                        buildCastle('#content', { data: data, settings: settings });
+                    for (const btn of btnsLevel) {
+                        btn.disabled = true;
                     }
-                }, 1000);
+
+                    btnLevel.innerHTML = `Level ${budova.level + 2}`;
+
+                    let time = budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3);
+                    finishTimeHandler(time, budova.link);
+
+                    const countdown = setInterval(() => {
+                        let bTime = displayBuildTime(time, budova.finishDateTime);
+                        let timeElement = getElement('#time-' + budova.link);
+
+                        if (timeElement) timeElement.innerHTML = `<strong style="color: darkgreen;">${bTime}</strong>`;
+
+                        if (bTime == "Stavba dokončena") {
+                            budova.level++;
+                            activeBuildStateHandler(false, "");
+                            finishTimeHandler("", budova.link);
+                            clearInterval(countdown);
+                            this.app.innerHTML = "";
+                            buildCastle('#content', { data: data, settings: settings });
+                        }
+                    }, 1000);
+                } else {
+                    let timeEl = getElement('#time-' + budova.link);
+                    timeEl.innerHTML = `<span style="color: red">Nemáš dostatek surovin!</span>`;
+                    setTimeout(() => {
+                        timeEl.innerHTML = displayBuildTime((budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3)));
+                    }, 5000);
+                }
 
             });
         }
@@ -193,11 +211,16 @@ class Controller {
         this.model = model;
         this.view = view;
 
-        this.onDisplayBuildings(this.handleActiveBuildState, this.finishTimeHandler, this.model.data, this.model.settings);
+        this.onDisplayBuildings(
+            this.handleActiveBuildState, 
+            this.finishTimeHandler, 
+            this.handleDecreaseGold, 
+            this.model.data, 
+            this.model.settings);
     }
 
-    onDisplayBuildings = (activeBuildStateHandler, finishTimeHandler, data, settings) => {
-        this.view.displayBuildings(activeBuildStateHandler, finishTimeHandler, data, settings);
+    onDisplayBuildings = (activeBuildStateHandler, finishTimeHandler, dicreaseGoldHandler, data, settings) => {
+        this.view.displayBuildings(activeBuildStateHandler, finishTimeHandler, dicreaseGoldHandler, data, settings);
     }
 
     handleActiveBuildState = (state, building) => {
@@ -206,6 +229,10 @@ class Controller {
 
     finishTimeHandler = (dateTime, link) => {
         this.model.bindFinishTimeState(dateTime, link);
+    }
+
+    handleDecreaseGold = gold => {
+        this.model.bindDicreaseGold(gold);
     }
 }
 

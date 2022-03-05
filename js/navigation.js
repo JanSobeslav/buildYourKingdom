@@ -17,6 +17,7 @@ class View {
         this.app = getElement(elName);
         //nav
         this.nav = createElement('nav', ['sb-topnav', 'navbar', 'navbar-expand', 'navbar-dark', 'bg-dark']);
+        this.nav.id = "game-navigation";
         //title
         this.title = createElement('a', ['navbar-brand', 'ps-3']);
         this.title.textContent = 'Název města MVC';

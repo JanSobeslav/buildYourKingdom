@@ -1,4 +1,6 @@
 import { displayBuildTime, createElement, getElement } from "./glMethods.js";
+import { buildDialog as dialog } from "./dialog.js";
+import { getData } from "./data.js";
 
 class Model {
     constructor(data) {
@@ -49,8 +51,10 @@ class View {
 
         this.content.append(this.contentHead);
         this.container.append(this.h1Title, this.hr, this.content);
+        this.modal = createElement('div');
+        this.modal.id = "modal-container";
 
-        this.app.append(this.container);
+        this.app.append(this.container, this.modal);
     }
 
     displayUnits(data) {
@@ -76,13 +80,17 @@ class View {
                 <span>${unit.attack}/${unit.defence}</span>
             </div>
             <div class="col-2">
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                data-bs-target="#horseModal">
+                <button type="button" class="btn btn-primary" id="${'recruit-' + unit.link}">
                     Rekrutovat
                 </button>
             </div>
             `;
             this.content.append(row);
+
+            document.getElementById("recruit-" + unit.link).addEventListener('click', () => {
+                this.modal.innerHTML = '';
+                dialog("#modal-container", getData(), unit);
+            });
         }
     }
 }

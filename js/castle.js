@@ -191,7 +191,7 @@ class View {
                             this.app.innerHTML = "";
                             buildCastle('#content', { data: data, settings: settings });
                         }
-                    }, 1000);
+                    }, 100);
                 } else {
                     let timeEl = getElement('#time-' + budova.link);
                     timeEl.innerHTML = `<span style="color: red">Nemáš dostatek surovin!</span>`;

@@ -99,9 +99,7 @@ class View {
                 if (event.target.className === ('nav-link ' + link)) {
                     //najde element s id content, odstraní z něj veškeré children a vloží konrétní komponentu
                     let content = getElement('#content');
-                    if (content.childNodes.length > 0) {
-                        content.removeChild(content.firstChild);
-                    }
+                    content.innerHTML = '';
                     a.classList.add("active");
                     handler(link);
                     const building = data.filter(b => {if (b.link === link) return b;});

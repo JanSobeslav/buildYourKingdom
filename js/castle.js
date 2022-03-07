@@ -144,7 +144,7 @@ class View {
             </div>
             <div class="col-2">
                 ${budova.priceGold} <i class="fas fa-cube" style="color: rgb(139, 126, 0);"></i> /
-                ${budova.priceCoins} <i class="fas fa-circle" style="color: rgb(139, 126, 0);"></i>
+                ${Math.ceil(budova.priceGold / 10)} <i class="fas fa-circle" style="color: rgb(139, 126, 0);"></i>
             </div>
             <div class="col-2" id="time-${budova.link}">
                 ${displayBuildTime((budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3)))}

@@ -71,7 +71,7 @@ class View {
             </div>
             <div class="col-2">
             ${unit.priceGold} <i class="fas fa-cube" style="color: rgb(139, 126, 0);"></i> /
-            ${unit.priceCoins} <i class="fas fa-circle" style="color: rgb(139, 126, 0);"></i>
+            ${Math.ceil(unit.priceGold / 10)} <i class="fas fa-circle" style="color: rgb(139, 126, 0);"></i>
             </div>
             <div class="col-2">
                 ${displayBuildTime(unit.time - (Math.pow(data[i].level, 2)))}

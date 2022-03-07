@@ -89,6 +89,7 @@ class View {
     displayData(data, building, settings) {
         this.modalHeaderTitle.innerHTML = data.name;
         let maxRecruitSol = (settings.gold - settings.gold % data.priceGold) / data.priceGold;
+        let disTime = data.time * Math.pow(building.level > 0 ? building.level : building.level + 1, 3);
         this.bTcContainer.innerHTML = `
         <div class="row justify-content-around mt-4">
             <div class="col-3">
@@ -110,12 +111,12 @@ class View {
                     maxRecruitSol
                 }">
             </div>
-            <div class="col-3">
+            <div class="col-3" id="price-${data.link}">
                 ${data.priceGold} <i class="fas fa-cube" style="color: rgb(139, 126, 0);"></i> /
-                ${data.priceCoins} <i class="fas fa-circle" style="color: rgb(139, 126, 0);"></i>
+                ${Math.ceil(data.priceGold / 10)} <i class="fas fa-circle" style="color: rgb(139, 126, 0);"></i>
             </div>
-            <div class="col-3">
-                ${displayBuildTime(data.time * Math.pow(building.level > 0 ? building.level : building.level + 1, 3))}
+            <div class="col-3" id="buildTime-${data.link}">
+                ${ displayBuildTime(disTime) }
             </div>
             <div class="col-3">
                 <button class="btn btn-primary" id="okBtn-${data.link}">OK</button>
@@ -154,21 +155,33 @@ class View {
 
         let input = document.getElementById("input-" + data.link);
         let okBtn = document.getElementById("okBtn-" + data.link);
+        let buildTime = document.getElementById("buildTime-" + data.link);
+        let priceEl = document.getElementById("price-" + data.link);
 
         input.addEventListener('keyup', () => {
-            this.changeInput(input, maxRecruitSol, okBtn);
+            this.changeInput(input, maxRecruitSol, okBtn, buildTime, disTime, priceEl, {gold: data.priceGold, coins: data.priceCoins});
         });
         input.addEventListener('change', () => {
-            this.changeInput(input, maxRecruitSol, okBtn);
+            this.changeInput(input, maxRecruitSol, okBtn, buildTime, disTime, priceEl, {gold: data.priceGold, coins: data.priceCoins});
         });
     }
 
-    changeInput(input, max, okBtn) {
+    changeInput(input, max, okBtn, timeEl, time, priceEl, price) {
+        timeEl.innerHTML = displayBuildTime((time * parseInt(input.value)));
+        const priceGold = price.gold * input.value;
+        priceEl.innerHTML = `
+        ${priceGold} <i class="fas fa-cube" style="color: rgb(139, 126, 0);"></i> /
+                ${Math.ceil(priceGold / 10)} <i class="fas fa-circle" style="color: rgb(139, 126, 0);"></i>
+        `;
         if (input.value > max) {
             input.style.color = 'red';
+            timeEl.style.color = 'red';
+            priceEl.style.color = 'red';
             okBtn.disabled = true;
         } else {
             input.style.color = 'black';
+            timeEl.style.color = 'black';
+            priceEl.style.color = 'black';
             okBtn.disabled = false;
         }
     }

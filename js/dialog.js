@@ -1,4 +1,7 @@
 import { displayBuildTime, createElement, getElement } from "./glMethods.js";
+import { buildNavigation as nav } from "./navigation.js";
+import { buildBarracks as barracks, buildBarracks } from "./barracks.js";
+import { getData } from "./data.js";
 
 class Model {
     constructor(data, unit) {
@@ -9,8 +12,34 @@ class Model {
     }
 
     getBarracks() {
-        const barracks = this.data.filter(b => {if (b.link === 'barracks') return b;});
+        const barracks = this.data.filter(b => { if (b.link === 'barracks') return b; });
         return barracks[0];
+    }
+
+    bindSubmit(data) {
+        const buildingIndex = this.data.findIndex(b => b.link === 'barracks');
+        const unitIndex = this.data[buildingIndex].soldiers_type.findIndex(u => u.link == data.unitType);
+        const finishDate = new Date();
+        finishDate.setSeconds(finishDate.getSeconds() + data.totalTime);
+
+        setTimeout(() => {
+            this.settings.army.swordsmans += data.unitSum;
+            if (this.settings.activeLink === 'barracks') {
+                const content = getElement('#content');
+                content.innerHTML = '';
+                barracks('#content', this.allData);
+            }
+        }, data.totalTime * 1000);
+        this.settings.gold -= data.totalPrice;
+        this.data[buildingIndex].soldiers_type[unitIndex].finishDateTime = finishDate;
+        this.settings.activeRecruitState = true;
+
+        console.log(this.settings);
+    }
+
+    bindRecruitState(state, building) {
+        this.settings.activeRecruitState = state;
+        this.settings.recruitingUpgradingState = building;
     }
 }
 
@@ -58,7 +87,7 @@ class View {
         this.bodyTabContentCont.setAttribute("aria-labelledby", "nav-recruit2-tab");
 
         this.bTcContainer = createElement('div', ["container"]);
-         //dynamicky vložit údaje
+        //dynamicky vložit údaje
 
         this.bodyTabContentCont.append(this.bTcContainer);
 
@@ -76,7 +105,7 @@ class View {
         this.modalContBody.append(this.bodyTabContent);
 
         this.modalCont.append(this.modalHeader, this.modalContBody);
-        
+
         this.modal.append(this.modalCont);
 
         this.dialog.append(this.modal);
@@ -86,7 +115,7 @@ class View {
         this.dialog.showModal();
     }
 
-    displayData(data, building, settings) {
+    displayData(data, building, settings, submitHandler, activeRecruitStateHandler) {
         this.modalHeaderTitle.innerHTML = data.name;
         let maxRecruitSol = (settings.gold - settings.gold % data.priceGold) / data.priceGold;
         let disTime = data.time * Math.pow(building.level > 0 ? building.level : building.level + 1, 3);
@@ -107,16 +136,15 @@ class View {
         </div>
         <div class="row justify-content-around mt-2 mb-2">
             <div class="col-3">
-                <input type="number" id="input-${data.link}" class="form-control" id="basic-url" aria-describedby="basic-addon3" min="1" placeholder="${
-                    maxRecruitSol
-                }">
+                <input type="number" id="input-${data.link}" class="form-control" id="basic-url" aria-describedby="basic-addon3" min="1" placeholder="${maxRecruitSol
+            }">
             </div>
             <div class="col-3" id="price-${data.link}">
                 ${data.priceGold} <i class="fas fa-cube" style="color: rgb(139, 126, 0);"></i> /
                 ${Math.ceil(data.priceGold / 10)} <i class="fas fa-circle" style="color: rgb(139, 126, 0);"></i>
             </div>
             <div class="col-3" id="buildTime-${data.link}">
-                ${ displayBuildTime(disTime) }
+                ${displayBuildTime(disTime)}
             </div>
             <div class="col-3">
                 <button class="btn btn-primary" id="okBtn-${data.link}">OK</button>
@@ -153,16 +181,48 @@ class View {
 
         this.modalHeaderClose.addEventListener('click', () => { this.dialog.close(); });
 
-        let input = document.getElementById("input-" + data.link);
-        let okBtn = document.getElementById("okBtn-" + data.link);
-        let buildTime = document.getElementById("buildTime-" + data.link);
-        let priceEl = document.getElementById("price-" + data.link);
+        let input = getElement("#input-" + data.link);
+        let okBtn = getElement("#okBtn-" + data.link);
+        let buildTime = getElement("#buildTime-" + data.link);
+        let priceEl = getElement("#price-" + data.link);
 
         input.addEventListener('keyup', () => {
-            this.changeInput(input, maxRecruitSol, okBtn, buildTime, disTime, priceEl, {gold: data.priceGold, coins: data.priceCoins});
+            this.changeInput(input, maxRecruitSol, okBtn, buildTime, disTime, priceEl, { gold: data.priceGold, coins: data.priceCoins });
         });
         input.addEventListener('change', () => {
-            this.changeInput(input, maxRecruitSol, okBtn, buildTime, disTime, priceEl, {gold: data.priceGold, coins: data.priceCoins});
+            this.changeInput(input, maxRecruitSol, okBtn, buildTime, disTime, priceEl, { gold: data.priceGold, coins: data.priceCoins });
+        });
+
+        okBtn.addEventListener('click', () => {
+            if (input.value <= maxRecruitSol) {
+                const dataSubmit = {
+                    unitSum: parseInt(input.value),
+                    totalPrice: parseInt(data.priceGold * input.value),
+                    unitType: data.link,
+                    totalTime: parseInt(disTime * parseInt(input.value))
+                };
+                submitHandler(dataSubmit);
+                activeRecruitStateHandler(true, data.link);
+                const countdown = setInterval(() => {
+                    let bTime = displayBuildTime(disTime, data.finishDateTime);
+                    let timeElement = getElement('#recruitTime-' + data.link);
+                    if (timeElement) timeElement.innerHTML = `<strong style="color: darkgreen;">${bTime}</strong>`;
+
+                    if (bTime == "Stavba dokončena") {
+                        activeRecruitStateHandler(false, "");
+                        clearInterval(countdown);
+                        if (settings.activeLink === 'barracks') {
+                            getElement('#content').innerHTML = '';
+                            buildBarracks('#content', getData());
+                        }
+                    }
+                }, 100);
+                getElement('#content').innerHTML = '';
+                buildBarracks('#content', getData());
+                this.dialog.close();
+                getElement('#game-navigation').innerHTML = '';
+                nav('#game-navigation', getData());
+            }
         });
     }
 
@@ -192,12 +252,20 @@ class Controller {
         this.model = model
         this.view = view
 
-        this.onDisplayData(this.model.unit, this.model.getBarracks(), this.model.settings);
+        this.onDisplayData(this.model.unit, this.model.getBarracks(), this.model.settings, this.handleSubmit, this.handleRecruitState);
     }
 
-    onDisplayData = (data, building, settings) => {
-        this.view.displayData(data, building, settings);
-    };
+    onDisplayData = (data, building, settings, submitHandler, recruitStateHandler) => {
+        this.view.displayData(data, building, settings, submitHandler, recruitStateHandler);
+    }
+
+    handleSubmit = (data) => {
+        this.model.bindSubmit(data);
+    }
+
+    handleRecruitState = (state, building) => {
+        this.model.bindRecruitState(state, building);
+    }
 
 }
 

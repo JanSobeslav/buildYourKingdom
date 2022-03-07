@@ -25,7 +25,7 @@ let data = [
         name: "Kasárna",
         link: "barracks",
         active: "false",
-        level: 1,
+        level: 0,
         priceGold: 10,
         priceCoins: 1,
         time: 19, //ČAS ZJISTIT
@@ -88,12 +88,18 @@ let settings = {
     userName: "hráč 1245",
     activeLink: "castle",
     activeBuildState: false,
+    activeRecruitState: false,
     buildingUpgradingState: "",
+    recruitingUpgradingState: "",
     gold: 60,
-    coins: 0
+    coins: 0,
+    army: {
+        swordsmans: 5,
+        archers: 0,
+        horsemans: 0
+    }
 };
 
 export function getData() {
-    const d = {'data': data, 'settings': settings};
-    return d;
+    return {'data': data, 'settings': settings};
 }

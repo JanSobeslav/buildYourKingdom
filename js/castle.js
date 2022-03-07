@@ -161,7 +161,7 @@ class View {
                     dicreaseGoldHandler(budova.priceGold);
 
                     getElement('#game-navigation').innerHTML = '';
-                    nav('#game-navigation', {data: data, settings: settings});
+                    nav('#game-navigation', { data: data, settings: settings });
 
                     activeBuildStateHandler(true, budova.link);
 
@@ -188,8 +188,10 @@ class View {
                             activeBuildStateHandler(false, "");
                             finishTimeHandler("", budova.link);
                             clearInterval(countdown);
-                            this.app.innerHTML = "";
-                            buildCastle('#content', { data: data, settings: settings });
+                            if (settings.activeLink === 'castle') {
+                                this.app.innerHTML = "";
+                                buildCastle('#content', { data: data, settings: settings });
+                            }
                         }
                     }, 100);
                 } else {
@@ -212,10 +214,10 @@ class Controller {
         this.view = view;
 
         this.onDisplayBuildings(
-            this.handleActiveBuildState, 
-            this.finishTimeHandler, 
-            this.handleDecreaseGold, 
-            this.model.data, 
+            this.handleActiveBuildState,
+            this.finishTimeHandler,
+            this.handleDecreaseGold,
+            this.model.data,
             this.model.settings);
     }
 

@@ -57,7 +57,7 @@ class View {
         this.app.append(this.container, this.modal);
     }
 
-    displayUnits(data) {
+    displayUnits(data, settings) {
         let i = data.findIndex(data => data.link === 'barracks');
         this.h1Title.innerHTML = data[i].name;
         for (const unit of data[i].soldiers_type) {
@@ -67,29 +67,31 @@ class View {
                 <i class="${unit.icon}"></i> ${unit.name}
             </div>
             <div class="col-2">
-                Aktuální počet
-            </div>
+            ${unit.link == 'swordsman' ? settings.army.swordsmans : ''}
+            ${unit.link == 'archer' ? settings.army.archers : ''}
+            ${unit.link == 'horseman' ? settings.army.horsemans : ''}  
+            </div >
             <div class="col-2">
             ${unit.priceGold} <i class="fas fa-cube" style="color: rgb(139, 126, 0);"></i> /
             ${Math.ceil(unit.priceGold / 10)} <i class="fas fa-circle" style="color: rgb(139, 126, 0);"></i>
             </div>
-            <div class="col-2">
+            <div class="col-2" id="recruitTime-${unit.link}">
                 ${displayBuildTime(unit.time - (Math.pow(data[i].level, 2)))}
             </div>
             <div class="col-2">
                 <span>${unit.attack}/${unit.defence}</span>
             </div>
             <div class="col-2">
-                <button type="button" class="btn btn-primary" id="${'recruit-' + unit.link}">
+                <button type="button" class="btn btn-primary" ${settings.activeRecruitState && 'disabled'} id="${'recruit-' + unit.link}">
                     Rekrutovat
                 </button>
             </div>
-            `;
+        `;
             this.content.append(row);
 
             document.getElementById("recruit-" + unit.link).addEventListener('click', () => {
                 this.modal.innerHTML = '';
-                dialog("#modal-container", getData(), unit);
+                dialog("#modal-container", {data: data, settings: settings}, unit);
             });
         }
     }
@@ -100,12 +102,12 @@ class Controller {
         this.model = model
         this.view = view
 
-        this.onDisplayUnits(this.model.data);
+        this.onDisplayUnits(this.model.data, this.model.settings);
 
     }
 
-    onDisplayUnits = (data) => {
-        this.view.displayUnits(data);
+    onDisplayUnits = (data, settings) => {
+        this.view.displayUnits(data, settings);
     }
 }
 

@@ -14,7 +14,7 @@ let data = [
         name: "Zlatý důl",
         link: "gold-mine",
         active: "false",
-        level: 1,
+        level: 5,
         priceGold: 20,
         priceCoins: 2,
         time: 40, //ČAS ZJISTIT

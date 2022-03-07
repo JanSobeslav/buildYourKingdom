@@ -55,6 +55,8 @@ class View {
 
         this.nav.append(this.title, this.toggleButton, this.resources, this.userMenuUL);
         this.app.append(this.nav);
+
+        this.isDelivered = false;
     }
 
 
@@ -70,11 +72,14 @@ class View {
         let nextDelivery = new Date();
         const index = data.findIndex((b) => b.link === 'gold-mine');
         this.displayRes(nextDelivery, settings);
-        setInterval(() => {
+        setTimeout(() => {this.isDelivered = false;}, 1000);
+        const interval = setInterval(() => {
             nextDelivery = new Date();
-            if ((nextDelivery.getMinutes() == 0) && nextDelivery.getSeconds() == 0) {
-                this.displayRes(nextDelivery, settings);
+            if ((nextDelivery.getMinutes() == 0) && nextDelivery.getSeconds() == 0 && !this.isDelivered) {
+                this.isDelivered = true;
                 deliveryHandler(1 * (Math.pow(data[index].level, 2)));
+                clearInterval(interval);
+                this.displayResources(settings, data, deliveryHandler);
             }
         }, 500);
 

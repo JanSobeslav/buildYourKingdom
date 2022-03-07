@@ -25,7 +25,7 @@ let data = [
         name: "Kasárna",
         link: "barracks",
         active: "false",
-        level: 0,
+        level: 1,
         priceGold: 10,
         priceCoins: 1,
         time: 19, //ČAS ZJISTIT

@@ -58,22 +58,7 @@ class View {
         this.bodyTabContentCont.setAttribute("aria-labelledby", "nav-recruit2-tab");
 
         this.bTcContainer = createElement('div', ["container"]);
-        this.bTcContainer.innerHTML = `
-        <div class="row justify-content-around mt-4">
-            <div class="col-3">
-                <b>Počet</b>
-            </div>
-            <div class="col-3">
-                <b>Náklady</b>
-            </div>
-            <div class="col-3">
-                <b>Čas</b>
-            </div>
-            <div class="col-3">
-                
-            </div>
-        </div>
-        `; //dynamicky vložit údaje
+         //dynamicky vložit údaje
 
         this.bodyTabContentCont.append(this.bTcContainer);
 
@@ -83,19 +68,6 @@ class View {
         this.bodyTabContentCont2.setAttribute("aria-labelledby", "nav-discharge2-tab");
 
         this.bTc2Container = createElement('div', ["container"]);
-        this.bTc2Container.innerHTML = `
-        <div class="row justify-content-around mt-4">
-            <div class="col-3">
-                <b>Počet</b>
-            </div>
-            <div class="col-3">
-                <b>Vrácení</b>
-            </div>
-            <div class="col-3">
-
-            </div>
-        </div>
-        `;
 
         this.bodyTabContentCont2.append(this.bTc2Container);
 
@@ -116,6 +88,7 @@ class View {
 
     displayData(data, building, settings) {
         this.modalHeaderTitle.innerHTML = data.name;
+        let maxRecruitSol = (settings.gold - settings.gold % data.priceGold) / data.priceGold;
         this.bTcContainer.innerHTML = `
         <div class="row justify-content-around mt-4">
             <div class="col-3">
@@ -133,8 +106,8 @@ class View {
         </div>
         <div class="row justify-content-around mt-2 mb-2">
             <div class="col-3">
-                <input type="number" class="form-control" id="basic-url" aria-describedby="basic-addon3" min="1" placeholder="${
-                    (settings.gold - settings.gold%data.priceGold) / data.priceGold
+                <input type="number" id="input-${data.link}" class="form-control" id="basic-url" aria-describedby="basic-addon3" min="1" placeholder="${
+                    maxRecruitSol
                 }">
             </div>
             <div class="col-3">
@@ -145,7 +118,7 @@ class View {
                 ${displayBuildTime(data.time * Math.pow(building.level > 0 ? building.level : building.level + 1, 3))}
             </div>
             <div class="col-3">
-                <button class="btn btn-primary">OK</button>
+                <button class="btn btn-primary" id="okBtn-${data.link}">OK</button>
             </div>
         </div>
         `;
@@ -178,6 +151,26 @@ class View {
         this.bodyTabContentCont2.append(this.bTc2Container);
 
         this.modalHeaderClose.addEventListener('click', () => { this.dialog.close(); });
+
+        let input = document.getElementById("input-" + data.link);
+        let okBtn = document.getElementById("okBtn-" + data.link);
+
+        input.addEventListener('keyup', () => {
+            this.changeInput(input, maxRecruitSol, okBtn);
+        });
+        input.addEventListener('change', () => {
+            this.changeInput(input, maxRecruitSol, okBtn);
+        });
+    }
+
+    changeInput(input, max, okBtn) {
+        if (input.value > max) {
+            input.style.color = 'red';
+            okBtn.disabled = true;
+        } else {
+            input.style.color = 'black';
+            okBtn.disabled = false;
+        }
     }
 }
 

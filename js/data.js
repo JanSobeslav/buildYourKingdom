@@ -14,7 +14,7 @@ let data = [
         name: "Zlatý důl",
         link: "gold-mine",
         active: "false",
-        level: 5,
+        level: 1,
         priceGold: 20,
         priceCoins: 2,
         time: 40, //ČAS ZJISTIT
@@ -71,7 +71,7 @@ let data = [
         name: "Mincovna",
         link: "mint",
         active: "false",
-        level: 0,
+        level: 1,
         priceGold: 28,
         priceCoins: 3,
         time: 120, //ČAS ZJISTIT
@@ -89,6 +89,7 @@ let settings = {
     activeLink: "castle",
     activeBuildState: false,
     activeRecruitState: false,
+    activeMintState: false,
     buildingUpgradingState: "",
     recruitingUpgradingState: "",
     gold: 60,

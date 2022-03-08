@@ -1,4 +1,5 @@
 import { displayBuildTime, createElement, getElement } from "./glMethods.js";
+import { buildNavigation as nav } from "./navigation.js";
 
 class Model {
     constructor(data) {
@@ -9,6 +10,24 @@ class Model {
         this._unchangedData = data.data;
     }
 
+    bindSubmit(submitData) {
+        const mintIndex = this.data.findIndex(b => b.link === 'mint');
+        let date = new Date();
+        date.setSeconds(date.getSeconds() + submitData.totalTime);
+
+        this.settings.gold -= submitData.totalPrice;
+        this.data[mintIndex].finishDateTime = date;
+        setTimeout(() => {
+            this.settings.coins += submitData.totalCoins;
+            getElement('#game-navigation').innerHTML = '';
+            nav('#game-navigation', this.allData);
+        }, submitData.totalTime * 1000);
+
+    }
+
+    bindActiveMintState(state) {
+        this.settings.activeMintState = state;
+    }
 }
 
 class View {
@@ -33,8 +52,7 @@ class View {
             <div class="col-2">
                 <b>Potřebné zlato</b>
             </div>
-            <div class="col-2">
-                <b>Vyrazit</b>
+            <div class="col-2"> 
             </div>
         `;
 
@@ -52,7 +70,7 @@ class View {
 
     }
 
-    displayCoins(data) {
+    displayCoins(data, settings, submitHandler, activeMintStateHandler) {
         let i = data.findIndex(data => data.link === 'mint');
         this.h1Title.innerHTML = data[i].name;
 
@@ -70,7 +88,7 @@ class View {
             ${data[i].coin.price}
         </div>
         <div class="col-2">
-            <button class="btn btn-primary">OK</button>
+            <button class="btn btn-primary" id="okBtnMint">Vyrazit</button>
         </div>
         `;
 
@@ -84,20 +102,62 @@ class View {
         `;
 
         let input = getElement('#coinsRangeInput');
+        let okBtn = getElement('#okBtnMint');
+        let input_value = 1;
+
+        if (settings.activeMintState) {
+            okBtn.disabled = true;
+        } else {
+            okBtn.disabled = false;
+        }
         input.addEventListener('change', (event) => {
-            let input_value = event.target.value;
+            input_value = parseInt(event.target.value);
             getElement('#coinTime').innerHTML = displayBuildTime((data[i].coin.time - (data[i].level * 0.5)) * input_value);
             getElement('#coinPrice').innerHTML = (data[i].coin.price) * input_value;
             getElement('#coins').innerHTML = input_value;
             // this.coinPriceChange(data, uData, parseInt(input_value));
-          });
-    }
+            if (input_value * data[i].coin.price > settings.gold) {
+                okBtn.disabled = true;
+                getElement('#coinPrice').style.color = 'red';
+            } else {
+                okBtn.disabled = false;
+                getElement('#coinPrice').style.color = 'black';
+            }
 
-    coinPriceChange(data, uData, count) {
-        let i = uData.findIndex(data => data.link === 'mint');
-        data[i].coin.price = uData[i].coin.price * count;
-        data[i].coin.time = uData[i].coin.time * count;
-        this.displayCoins(data, uData, count);
+        });
+        okBtn.addEventListener('click', () => {
+            if (input_value * data[i].coin.price <= settings.gold) {
+                let time = (data[i].coin.time - (data[i].level * 0.5)) * input_value;
+                okBtn.disabled = true;
+                const dataSubmit = {
+                    totalPrice: input_value * data[i].coin.price,
+                    totalCoins: input_value,
+                    totalTime: Math.round(time)
+                };
+                submitHandler(dataSubmit);
+                activeMintStateHandler(true);
+
+                const countdown = setInterval(() => {
+                    let bTime = displayBuildTime(dataSubmit.totalTime, data[i].finishDateTime);
+                    let timeElement = getElement('#coinTime');
+                    if (timeElement) timeElement.innerHTML = `<strong style="color: darkgreen;">${bTime}</strong>`;
+
+                    if (bTime == "Stavba dokončena") {
+                        activeMintStateHandler(false);
+                        clearInterval(countdown);
+                        if (settings.activeLink === 'mint') {
+                            this.app.innerHTML = '';
+                            buildMint('#content', { data: data, settings: settings });
+                            getElement('#game-navigation').innerHTML = '';
+                            nav('#game-navigation', { data: data, settings: settings });
+                        }
+                    }
+                }, 100);
+
+                getElement('#game-navigation').innerHTML = '';
+                nav('#game-navigation', { data: data, settings: settings });
+            }
+        });
     }
 }
 
@@ -106,11 +166,19 @@ class Controller {
         this.model = model
         this.view = view
 
-        this.onDisplayCoins(this.model.data, this.model._unchangedData, 1);
+        this.onDisplayCoins(this.model.data, this.model.settings, this.onSubmit, this.onActiveMintState);
     }
 
-    onDisplayCoins = (data, count) => {
-        this.view.displayCoins(data, count);
+    onDisplayCoins = (data, settings, submitHandler, mintStateHandler) => {
+        this.view.displayCoins(data, settings, submitHandler, mintStateHandler);
+    }
+
+    onSubmit = (data) => {
+        this.model.bindSubmit(data);
+    }
+
+    onActiveMintState = (state) => {
+        this.model.bindActiveMintState(state);
     }
 
 }

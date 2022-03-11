@@ -31,6 +31,10 @@ class Model {
     bindDicreaseGold(gold) {
         this.settings.gold -= gold;
     }
+
+    bindDicreaseCoins(coins) {
+        this.settings.coins -= coins;
+    }
 }
 
 class View {
@@ -109,7 +113,7 @@ class View {
         this.app.append(this.container);
     }
 
-    displayBuildings(activeBuildStateHandler, finishTimeHandler, dicreaseGoldHandler, data, settings) {
+    displayBuildings(activeBuildStateHandler, finishTimeHandler, dicreaseGoldHandler, dicreaseCoinsHandler, data, settings) {
         let i = data.findIndex(data => data.link === 'castle');
         this.h1.textContent = data[i].name;
         let tpcRowHeader = createElement('div', ['row', 'justify-content-around', 'mb-4']);
@@ -134,6 +138,8 @@ class View {
         let castleLevel = 0;
         for (let budova of data) {
             let row = createElement('div', ['row', 'justify-content-around', 'mb-2']);
+            const buildingCoinsCost = budova.level == 0 ? budova.priceCoins : Math.ceil(budova.priceGold / 10) * budova.level;
+
             if (budova.link === 'castle') castleLevel = budova.level;
             row.innerHTML = `
             <div class="col-2">
@@ -143,8 +149,10 @@ class View {
                 ${budova.level}
             </div>
             <div class="col-2">
+                <input type="radio" name="flexRadioDefault-${budova.link}" value="inputGold" id="inputGold-${budova.link}" checked/>
                 ${budova.level == 0 ? budova.priceGold : budova.priceGold * budova.level} <i class="fas fa-cube" style="color: rgb(139, 126, 0);"></i> /
-                ${budova.level == 0 ? budova.priceCoins : Math.ceil(budova.priceGold / 10) * budova.level} <i class="fas fa-circle" style="color: rgb(139, 126, 0);"></i>
+                ${buildingCoinsCost} <i class="fas fa-circle" style="color: rgb(139, 126, 0);"></i>
+                <input type="radio" name="flexRadioDefault-${budova.link}" value="inputCoins" id="inputCoins-${budova.link}" />
             </div>
             <div class="col-2" id="time-${budova.link}">
                 ${displayBuildTime((budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3)))}
@@ -157,8 +165,15 @@ class View {
             this.tabPaneContBuildings.append(row);
 
             document.getElementById("level-" + budova.link).addEventListener('click', () => {
-                if (budova.priceGold < settings.gold) {
-                    dicreaseGoldHandler(budova.priceGold);
+                let radioGold = getElement('#inputGold-' + budova.link);
+                let radioCoins = getElement('#inputCoins-' + budova.link);
+                if ((budova.priceGold < settings.gold && radioGold.checked) || (budova.priceCoins < settings.coins && radioCoins.checked)) {
+                    if (radioGold.checked) {
+                        dicreaseGoldHandler(budova.priceGold);
+                    } else if (radioCoins.checked) {
+                        dicreaseCoinsHandler(buildingCoinsCost);
+                    }
+                    
 
                     getElement('#game-navigation').innerHTML = '';
                     nav('#game-navigation', { data: data, settings: settings });
@@ -196,10 +211,18 @@ class View {
                     }, 100);
                 } else {
                     let timeEl = getElement('#time-' + budova.link);
-                    timeEl.innerHTML = `<span style="color: red">Nemáš dostatek surovin!</span>`;
-                    setTimeout(() => {
-                        timeEl.innerHTML = displayBuildTime((budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3)));
-                    }, 5000);
+                    if (radioGold.checked || radioCoins.checked) {
+                        timeEl.innerHTML = `<span style="color: red">Nemáš dostatek zlata nebo mincí!</span>`;
+                        setTimeout(() => {
+                            timeEl.innerHTML = displayBuildTime((budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3)));
+                        }, 5000);
+                    } else {
+                        timeEl.innerHTML = `<span style="color: red">Vyber čím budeš platit!</span>`;
+                        setTimeout(() => {
+                            timeEl.innerHTML = displayBuildTime((budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3)));
+                        }, 5000);
+                    }
+
                 }
 
             });
@@ -217,12 +240,13 @@ class Controller {
             this.handleActiveBuildState,
             this.finishTimeHandler,
             this.handleDecreaseGold,
+            this.handleDecreaseCoins,
             this.model.data,
             this.model.settings);
     }
 
-    onDisplayBuildings = (activeBuildStateHandler, finishTimeHandler, dicreaseGoldHandler, data, settings) => {
-        this.view.displayBuildings(activeBuildStateHandler, finishTimeHandler, dicreaseGoldHandler, data, settings);
+    onDisplayBuildings = (activeBuildStateHandler, finishTimeHandler, dicreaseGoldHandler, dicreaseCoinsHandler, data, settings) => {
+        this.view.displayBuildings(activeBuildStateHandler, finishTimeHandler, dicreaseGoldHandler, dicreaseCoinsHandler, data, settings);
     }
 
     handleActiveBuildState = (state, building) => {
@@ -235,6 +259,10 @@ class Controller {
 
     handleDecreaseGold = gold => {
         this.model.bindDicreaseGold(gold);
+    }
+
+    handleDecreaseCoins = coins => {
+        this.model.bindDicreaseCoins(coins);
     }
 }
 

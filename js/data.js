@@ -71,7 +71,7 @@ let data = [
         name: "Mincovna",
         link: "mint",
         active: "false",
-        level: 1,
+        level: 0,
         priceGold: 28,
         priceCoins: 3,
         time: 120, //ČAS ZJISTIT

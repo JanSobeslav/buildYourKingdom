@@ -98,6 +98,15 @@ let settings = {
         swordsmans: 5,
         archers: 0,
         horsemans: 0
+    },
+    event_attack: {
+        time: 10,
+        units: {
+            swordsmans: 5,
+            archers: 0,
+            horsemans: 0
+        },
+        arriveDate: ""
     }
 };
 

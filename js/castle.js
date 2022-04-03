@@ -198,7 +198,7 @@ class View {
 
                         if (timeElement) timeElement.innerHTML = `<strong style="color: darkgreen;">${bTime}</strong>`;
 
-                        if (bTime == "Stavba dokončena") {
+                        if (bTime == "Dokončeno") {
                             budova.level++;
                             activeBuildStateHandler(false, "");
                             finishTimeHandler("", budova.link);
@@ -212,7 +212,7 @@ class View {
                 } else {
                     let timeEl = getElement('#time-' + budova.link);
                     if (radioGold.checked || radioCoins.checked) {
-                        timeEl.innerHTML = `<span style="color: red">Nemáš dostatek zlata nebo mincí!</span>`;
+                        timeEl.innerHTML = `<span style="color: red">Nemáš dostatek zlata/mincí!</span>`;
                         setTimeout(() => {
                             timeEl.innerHTML = displayBuildTime((budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3)));
                         }, 5000);

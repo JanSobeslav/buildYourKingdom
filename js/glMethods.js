@@ -4,7 +4,7 @@ export function displayBuildTime(t, date = null) {
         let buildDate = new Date(date);
         t = (buildDate - currentDate) / 1000;
         if (buildDate <= currentDate) {
-            return "Stavba dokončena";
+            return "Dokončeno";
         }
     }
     const sec = parseInt(t, 10); // convert value to number if it's string
@@ -49,4 +49,10 @@ function formatTime(t) {
         t = "0" + t;
     }
     return t;
+}
+
+export function fight(userArmy, enemyArmy) {
+    //funkce pro propočtení
+
+    //return object počtu zbylých vojáků
 }

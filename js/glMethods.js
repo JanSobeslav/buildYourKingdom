@@ -52,6 +52,8 @@ function formatTime(t) {
 }
 
 export function fight(userArmy, enemyArmy) {
+
+    
     //funkce pro propočtení
 
     //return object počtu zbylých vojáků

@@ -6,7 +6,7 @@ let data = [
         level: 1,
         priceGold: 15,
         priceCoins: 1,
-        time: 25, //ČAS ZJISTIT
+        time: 12, //ČAS ZJISTIT
         finishDateTime: "",
         icon: "fab fa-fort-awesome-alt",
     },
@@ -17,7 +17,7 @@ let data = [
         level: 1,
         priceGold: 20,
         priceCoins: 2,
-        time: 40, //ČAS ZJISTIT
+        time: 20, //ČAS ZJISTIT
         finishDateTime: "",
         icon: "fas fa-cubes"
     },
@@ -25,10 +25,10 @@ let data = [
         name: "Kasárna",
         link: "barracks",
         active: "false",
-        level: 0,
+        level: 1,
         priceGold: 10,
         priceCoins: 1,
-        time: 19, //ČAS ZJISTIT
+        time: 9, //ČAS ZJISTIT
         finishDateTime: "",
         icon: "fas fa-chess-rook",
         soldiers_type: [
@@ -37,7 +37,7 @@ let data = [
                 link: "swordsman",
                 priceGold: 5,
                 priceCoins: 1,
-                time: 516,
+                time: 258,
                 attack: 3,
                 defence: 3,
                 finishDateTime: "",
@@ -48,7 +48,7 @@ let data = [
                 link: "archer",
                 priceGold: 6,
                 priceCoins: 1,
-                time: 556,
+                time: 278,
                 attack: 2,
                 defence: 5,
                 finishDateTime: "",
@@ -59,7 +59,7 @@ let data = [
                 link: "horseman",
                 priceGold: 9,
                 priceCoins: 2,
-                time: 846,
+                time: 423,
                 attack: 6,
                 defence: 4,
                 finishDateTime: "",
@@ -71,14 +71,14 @@ let data = [
         name: "Mincovna",
         link: "mint",
         active: "false",
-        level: 0,
+        level: 1,
         priceGold: 28,
         priceCoins: 3,
-        time: 120, //ČAS ZJISTIT
+        time: 60, //ČAS ZJISTIT
         finishDateTime: "",
         icon: "fas fa-coins",
         coin: {
-            time: 1541,
+            time: 770,
             price: 10
         }
     }
@@ -95,18 +95,19 @@ let settings = {
     gold: 60,
     coins: 0,
     army: {
-        swordsmans: 5,
-        archers: 0,
-        horsemans: 0
+        swordsmans: 50,
+        archers: 34,
+        horsemans: 12
     },
     event_attack: {
-        time: 10,
+        time: 100,
         units: {
             swordsmans: 5,
             archers: 0,
             horsemans: 0
         },
-        arriveDate: ""
+        arriveDate: "",
+        attackState: false,
     }
 };
 

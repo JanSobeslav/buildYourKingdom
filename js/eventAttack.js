@@ -39,7 +39,8 @@ class View {
     }
 
     displayEvent(data, settings, time, setArmy) {
-        time(settings.event_attack.time);
+        const [barracks] = data.filter(b => b.link === 'barracks');
+        time((settings.event_attack.time * barracks.level));
         this.alertContent.innerHTML = `
         <div class="row">
             <div class="col-6">
@@ -65,6 +66,7 @@ class View {
 
             if (bTime == "Dokončeno") {
                 //setArmy(fight(settings.army, settings.event_attack.units));
+                settings.event_attack.attackState = false;
                 this.alert.remove();
                 clearInterval(countdown);
             }

@@ -1,5 +1,6 @@
 import { displayBuildTime, createElement, getElement } from "./glMethods.js";
 import { buildNavigation as nav } from "./navigation.js";
+import { buildEventAttack as eventAttack } from "./eventAttack.js";
 
 class Model {
     constructor(data) {
@@ -206,6 +207,10 @@ class View {
                             if (settings.activeLink === 'castle') {
                                 this.app.innerHTML = "";
                                 buildCastle('#content', { data: data, settings: settings });
+                            }
+                            if (budova.link === 'barracks' && budova.level % 2 === 0 && settings.event_attack.attackState === false) {
+                                settings.event_attack.attackState = true;
+                                eventAttack('#root', {data, settings});
                             }
                         }
                     }, 100);

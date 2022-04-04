@@ -27,6 +27,9 @@ class View {
         this.toggleButton.id = 'sidebarToggle';
         this.toggleButton.innerHTML = '<i class="fas fa-bars"></i>';
 
+        //army
+        this.army = createElement('span', ['ms-auto']);
+
         //resources
         this.resources = createElement('span', ['ms-auto']);
 
@@ -53,7 +56,7 @@ class View {
         this.userMenuLI.append(this.toggleDropdown, this.dropdownUL);
         this.userMenuUL.append(this.userMenuLI);
 
-        this.nav.append(this.title, this.toggleButton, this.resources, this.userMenuUL);
+        this.nav.append(this.title, this.toggleButton, this.army, this.resources, this.userMenuUL);
         this.app.append(this.nav);
 
         this.isDelivered = false;
@@ -72,7 +75,7 @@ class View {
         let nextDelivery = new Date();
         const index = data.findIndex((b) => b.link === 'gold-mine');
         this.displayRes(nextDelivery, settings);
-        setTimeout(() => {this.isDelivered = false;}, 1000);
+        setTimeout(() => { this.isDelivered = false; }, 1000);
         const interval = setInterval(() => {
             nextDelivery = new Date();
             if ((nextDelivery.getMinutes() == 0) && nextDelivery.getSeconds() == 0 && !this.isDelivered) {
@@ -93,7 +96,23 @@ class View {
         <i class="fas fa-trailer" style="color: #522900;margin-left: 1.5rem;margin-right: 0.5rem;"></i>
         <span class="text-secondary">Další dodávka: <span id="next-delivery"> ${nextDelivery}:00:00 </span></span>`;
     }
-    
+
+    displayArmy(data, settings) {
+        const [barracks] = data.filter(b => b.link === 'barracks');
+        let [swordsmanIcon] = barracks.soldiers_type.filter(u => u.link === 'swordsman');
+        swordsmanIcon = swordsmanIcon.icon;
+        let [archerIcon] = barracks.soldiers_type.filter(u => { if (u.link === 'archer') return u.icon });
+        archerIcon = archerIcon.icon;
+        let [horsemanIcon] = barracks.soldiers_type.filter(u => { if (u.link === 'horseman') return u.icon });
+        horsemanIcon = horsemanIcon.icon;
+        this.army.innerHTML = `
+                <i class="${swordsmanIcon}" style="color: white;"></i><span class="text-secondary" style="margin-left: 0.4rem;margin-right: 0.8rem;">${settings.army.swordsmans} </span>
+                <i class="${archerIcon}" style="color: white;"></i><span class="text-secondary" style="margin-left: 0.4rem;margin-right: 0.8rem;">${settings.army.archers} </span>
+                <i class="${horsemanIcon}" style="color: white;"></i><span class="text-secondary" style="margin-left: 0.4rem;margin-right: 0.8rem;">${settings.army.horsemans} </span>
+            `;
+
+    }
+
 }
 
 class Controller {
@@ -108,6 +127,7 @@ class Controller {
         this.view.displayUserName(settings);
         this.view.displayTownName(settings);
         this.view.displayResources(settings, data, deliveryHandler);
+        this.view.displayArmy(data, settings);
     }
 
     onDelivery = (gold) => {

@@ -100,7 +100,7 @@ let settings = {
         horsemans: 12
     },
     event_attack: {
-        time: 100,
+        time: 2,
         units: {
             swordsmans: 5,
             archers: 0,

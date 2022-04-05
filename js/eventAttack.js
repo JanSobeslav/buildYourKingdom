@@ -1,4 +1,5 @@
 import { createElement, getElement, displayBuildTime, fight } from "./glMethods.js";
+import { buildNavigation as nav } from "./navigation.js";
 
 class Model {
     constructor(data) {
@@ -65,7 +66,9 @@ class View {
             if (timeElement) timeElement.innerHTML = bTime;
 
             if (bTime == "Dokončeno") {
-                //setArmy(fight(settings.army, settings.event_attack.units));
+                setArmy(fight(settings.army, settings.event_attack.units));
+                getElement('#game-navigation').innerHTML = '';
+                nav('#game-navigation', { data: data, settings: settings });
                 settings.event_attack.attackState = false;
                 this.alert.remove();
                 clearInterval(countdown);
@@ -83,8 +86,8 @@ class Controller {
         this.onDisplayEvent(this.model.data, this.model.settings, this.bindFinishTime, this.bindArmy);
     }
 
-    onDisplayEvent = (data, settings, bindArriveTime) => {
-        this.view.displayEvent(data, settings, bindArriveTime);
+    onDisplayEvent = (data, settings, bindArriveTime, bindArmy) => {
+        this.view.displayEvent(data, settings, bindArriveTime, bindArmy);
     }
 
     bindFinishTime = (time) => {

@@ -53,8 +53,12 @@ function formatTime(t) {
 
 export function fight(userArmy, enemyArmy) {
 
-    
-    //funkce pro propočtení
+    userArmy.swordsmans -= enemyArmy.swordsmans;
+    userArmy.archers -= enemyArmy.archers;
+    userArmy.horsemans -= enemyArmy.horsemans;
+    if (userArmy.swordsmans < 0) userArmy.swordsmans = 0;
+    if (userArmy.archers < 0) userArmy.archers = 0;
+    if (userArmy.horsemans < 0) userArmy.horsemans = 0;
 
-    //return object počtu zbylých vojáků
+    return userArmy;
 }

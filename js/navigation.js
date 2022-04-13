@@ -1,4 +1,8 @@
-import { getElement, createElement, serverTime } from "./glMethods.js";
+import { getElement, createElement, serverTime, save } from "./glMethods.js";
+import { buildCastle as castle } from "./castle.js";
+import { buildGoldMine as mine } from "./gold-mine.js";
+import { buildBarracks as barracks } from "./barracks.js";
+import { buildMint as mint } from "./mint.js";
 
 class Model {
     constructor(data) {
@@ -8,6 +12,17 @@ class Model {
 
     bindDelivery(gold) {
         this.settings.gold += gold;
+        save({ data: this.data, settings: this.settings });
+    }
+
+    bindTitleChange(title) {
+        this.settings.townName = title;
+        save({ data: this.data, settings: this.settings });
+    }
+
+    bindSpeedUp(speed) {
+        this.settings.speedUp = speed;
+        save({ data: this.data, settings: this.settings });
     }
 
 }
@@ -20,8 +35,11 @@ class View {
         this.nav.id = "game-navigation";
         //title
         this.title = createElement('a', ['navbar-brand', 'ps-3']);
-        this.title.textContent = 'Název města MVC';
-        this.title.addEventListener('click', event => { location.reload(); });
+        this.titleInput = createElement('input', ['ms-2']);
+        this.titleInput.hidden = true;
+        this.titleInputOk = createElement('button', ['ms-1', 'btn', 'btn-primary']);
+        this.titleInputOk.innerHTML = 'Ok';
+        this.titleInputOk.hidden = true;
         //toggleButton
         this.toggleButton = createElement('button', ['btn', 'btn-link', 'btn-sm', 'order-1', 'order-lg-0', 'me-4', 'me-lg-0', 'mr-5']);
         this.toggleButton.id = 'sidebarToggle';
@@ -33,30 +51,27 @@ class View {
         //resources
         this.resources = createElement('span', ['ms-auto']);
 
+        //speedUp
+
+        this.speedUp = createElement('div', ['ms-auto']);
+        this.speedUp.style.cursor = 'pointer';
+        this.speedUp.innerHTML = `<i class="fas fa-play text-secondary"></i>`;
+
         //userMenu
-        this.userMenuUL = createElement('ul', ['navbar-nav', 'ms-auto', 'ms-auto', 'me-0', 'me-md-3', 'my-2', 'my-md-0', 'd-none', 'd-md-inline-block', 'form-inline']);
+        this.userMenuUL = createElement('ul', ['navbar-nav', 'ms-auto', 'me-0', 'me-md-3', 'my-2', 'my-md-0', 'd-none', 'd-md-inline-block', 'form-inline']);
         this.userMenuLI = createElement('li', ['nav-item', 'dropdown']);
 
-        this.toggleDropdown = createElement('a', ['nav-link', 'dropdown-toggle']);
-        this.toggleDropdown.id = 'navbarDropdown';
-        this.toggleDropdown.setAttribute('role', 'button');
-        this.toggleDropdown.setAttribute('data-bs-toggle', 'dropdown');
+        this.toggleDropdown = createElement('a', ['nav-link']);
         this.toggleDropdown.innerHTML = '<i class="fas fa-user fa-fw"></i>';
 
         this.userName = createElement('span', 'userNameMenu');
-        this.userName.textContent = 'JménoA';
 
         this.toggleDropdown.append(this.userName);
 
-        this.dropdownUL = createElement('ul', ['dropdown-menu', 'dropdown-menu-end']);
-        this.dropdownUL.setAttribute('aria-labelledby', "navbarDropdown");
-        this.dropdownUL.innerHTML = '<li><a class="dropdown-item" href="#/settings">Nastavení</a></li>';
-        this.dropdownUL.innerHTML += '<li><a class="dropdown-item" onclick="alert(\'ANO\');">Odhlásit se!</a></li>';
-
-        this.userMenuLI.append(this.toggleDropdown, this.dropdownUL);
+        this.userMenuLI.append(this.toggleDropdown);
         this.userMenuUL.append(this.userMenuLI);
 
-        this.nav.append(this.title, this.toggleButton, this.army, this.resources, this.userMenuUL);
+        this.nav.append(this.title, this.titleInput, this.titleInputOk, this.toggleButton, this.army, this.resources, this.speedUp, this.userMenuUL);
         this.app.append(this.nav);
 
         this.isDelivered = false;
@@ -67,8 +82,24 @@ class View {
         this.userName.textContent = settings.userName;
     }
 
-    displayTownName(settings) {
-        this.title.textContent = settings.townName;
+    displayTownName(settings, handleTitleChange) {
+        this.title.innerHTML = settings.townName + '<i class="fas fa-edit ms-2 text-white"></i>';
+
+        this.title.addEventListener('click', () => {
+            this.title.hidden = true;
+            this.titleInput.hidden = false;
+            this.titleInput.type = 'text';
+            this.titleInput.value = settings.townName;
+            this.titleInputOk.hidden = false;
+        });
+
+        this.titleInputOk.addEventListener('click', () => {
+            handleTitleChange(this.titleInput.value);
+            this.title.innerHTML = settings.townName + '<i class="fas fa-edit ms-2 text-white"></i>';
+            this.title.hidden = false;
+            this.titleInput.hidden = true;
+            this.titleInputOk.hidden = true;
+        });
     }
 
     displayResources(settings, data, deliveryHandler) {
@@ -113,6 +144,50 @@ class View {
 
     }
 
+    displaySpeed(data, settings, handleSpeedUp) {
+        this.speed(null, settings, handleSpeedUp);
+        this.speedUp.addEventListener('click', () => {
+            const speed = settings.speedUp + 1;
+            handleSpeedUp(speed);
+            this.speed(speed, settings, handleSpeedUp);
+            const dataAll = {data, settings};
+            getElement('#content').innerHTML = '';
+            switch (settings.activeLink) {
+                case 'castle':
+                    castle(('#content'), dataAll);
+                    break;
+                case 'gold-mine':
+                    mine(('#content'), dataAll);
+                    break;
+                case 'barracks':
+                    barracks(('#content'), dataAll);
+                    break;
+                case 'mint':
+                    mint(('#content'), dataAll);
+                    break;
+            }
+        });
+    }
+
+    speed(s = null, settings, handleSpeedUp) {
+        if (s === null) s = settings.speedUp;
+        switch (s) {
+            case 1:
+                this.speedUp.innerHTML = `<i class="fas fa-play text-secondary"></i>`;
+                break;
+            case 2:
+                this.speedUp.innerHTML = `<i class="fas fa-forward text-secondary"></i>`;
+                break;
+            case 3:
+                this.speedUp.innerHTML = `<i class="fas fa-fast-forward text-secondary"></i>`;
+                break;
+            default:
+                handleSpeedUp(1);
+                this.speedUp.innerHTML = `<i class="fas fa-play text-secondary"></i>`;
+                break;
+        }
+    }
+
 }
 
 class Controller {
@@ -120,18 +195,27 @@ class Controller {
         this.model = model;
         this.view = view;
 
-        this.onGameInfoDisplay(this.model.settings, this.model.data, this.onDelivery);
+        this.onGameInfoDisplay(this.model.settings, this.model.data, this.onDelivery, this.onTitleChange, this.onSpeedUp);
     }
 
-    onGameInfoDisplay = (settings, data, deliveryHandler) => {
+    onGameInfoDisplay = (settings, data, deliveryHandler, handleTitleChange, handleSpeedUp) => {
         this.view.displayUserName(settings);
-        this.view.displayTownName(settings);
+        this.view.displayTownName(settings, handleTitleChange);
         this.view.displayResources(settings, data, deliveryHandler);
         this.view.displayArmy(data, settings);
+        this.view.displaySpeed(data, settings, handleSpeedUp);
     }
 
     onDelivery = (gold) => {
         this.model.bindDelivery(gold);
+    }
+
+    onTitleChange = (newTitle) => {
+        this.model.bindTitleChange(newTitle);
+    }
+
+    onSpeedUp = (speed) => {
+        this.model.bindSpeedUp(speed);
     }
 }
 

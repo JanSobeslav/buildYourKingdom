@@ -1,5 +1,6 @@
-import { displayBuildTime, createElement, getElement } from "./glMethods.js";
+import { displayBuildTime, createElement, getElement, save } from "./glMethods.js";
 import { buildDialog as dialog } from "./dialog.js";
+import { buildNavigation as nav } from "./navigation.js";
 import { getData } from "./data.js";
 
 class Model {
@@ -11,6 +12,32 @@ class Model {
 
     bindDisplayUnits(callback) {
         this.onDisplayUnits(callback);
+    }
+
+    bindRecruitState(state, link,  unitLink) {
+        this.settings.activeRecruitState = state;
+        this.settings.recruitingUpgradingState = link;
+        const indexBarracks = this.data.findIndex(b => b.link === 'barracks');
+        const indexUnit = this.data[indexBarracks].soldiers_type.findIndex(u => u.link === unitLink);
+        this.data[indexBarracks].soldiers_type[indexUnit].finishDateTime = null;
+        save({ data: this.data, settings: this.settings });
+    }
+
+    bindAddArmy(count, type) {
+        const [barracks] = this.data.filter(b => b.link === 'barracks');
+        const [unit] = barracks.soldiers_type.filter(s => s.link === type);
+        switch (type) {
+            case 'swordsman':
+                this.settings.army.swordsmans += count;
+                break;
+            case 'archer':
+                this.settings.army.archers += count;
+                break;
+            case 'horseman':
+                this.settings.army.horsemans += count;
+                break;
+        }
+        save({ data: this.data, settings: this.settings });
     }
 }
 
@@ -57,10 +84,11 @@ class View {
         this.app.append(this.container, this.modal);
     }
 
-    displayUnits(data, settings) {
+    displayUnits(data, settings, activeRecruitStateHandler, addToArmy) {
         let i = data.findIndex(data => data.link === 'barracks');
         this.h1Title.innerHTML = data[i].name;
         for (const unit of data[i].soldiers_type) {
+            let disTime = unit.time - (Math.pow(data[i].level, 2));
             let row = createElement('div', ['row', 'justify-content-around', 'mb-2']);
             row.innerHTML = `
             <div class="col-2">
@@ -76,7 +104,7 @@ class View {
             ${Math.ceil(unit.priceGold / 10)} <i class="fas fa-circle" style="color: rgb(139, 126, 0);"></i>
             </div>
             <div class="col-2" id="recruitTime-${unit.link}">
-                ${displayBuildTime(unit.time - (Math.pow(data[i].level, 2)))}
+                ${displayBuildTime(disTime)}
             </div>
             <div class="col-2">
                 <span>${unit.attack}/${unit.defence}</span>
@@ -91,8 +119,28 @@ class View {
 
             document.getElementById("recruit-" + unit.link).addEventListener('click', () => {
                 this.modal.innerHTML = '';
-                dialog("#modal-container", {data: data, settings: settings}, unit);
+                dialog("#modal-container", { data: data, settings: settings }, unit);
             });
+            if (settings.activeRecruitState && settings.recruitingUpgradingState === unit.link) {
+                const countdown = setInterval(() => {
+                    let bTime = displayBuildTime(0, unit.finishDateTime);
+                    let timeElement = getElement('#recruitTime-' + unit.link);
+                    if (timeElement) timeElement.innerHTML = `<strong style="color: darkgreen;">${bTime}</strong>`;
+
+                    if (bTime == "Dokončeno") {
+                        activeRecruitStateHandler(false, "", unit.link);
+                        addToArmy(unit.inProccess, unit.link);
+                        clearInterval(countdown);
+                        timeElement.innerHTML = '';
+                        if (settings.activeLink === 'barracks') {
+                            getElement('#content').innerHTML = '';
+                            buildBarracks('#content', { data, settings });
+                        }
+                        getElement('#game-navigation').innerHTML = '';
+                        nav('#game-navigation', { data, settings });
+                    }
+                }, 100);
+            }
         }
     }
 }
@@ -102,13 +150,22 @@ class Controller {
         this.model = model
         this.view = view
 
-        this.onDisplayUnits(this.model.data, this.model.settings);
+        this.onDisplayUnits(this.model.data, this.model.settings, this.handleRecruitState, this.addArmy);
 
     }
 
-    onDisplayUnits = (data, settings) => {
-        this.view.displayUnits(data, settings);
+    onDisplayUnits = (data, settings, activeRecruitStateHandler, addArmy) => {
+        this.view.displayUnits(data, settings, activeRecruitStateHandler, addArmy);
     }
+
+    handleRecruitState = (state, building, unitLink) => {
+        this.model.bindRecruitState(state, building, unitLink);
+    }
+
+    addArmy = (count, unit_type) => {
+        this.model.bindAddArmy(count, unit_type);
+    }
+
 }
 
 export function buildBarracks(elName, data) {

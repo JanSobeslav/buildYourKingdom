@@ -6,7 +6,7 @@ let data = [
         level: 1,
         priceGold: 15,
         priceCoins: 1,
-        time: 12, //ČAS ZJISTIT
+        time: 40, //ČAS ZJISTIT
         finishDateTime: "",
         icon: "fab fa-fort-awesome-alt",
     },
@@ -17,7 +17,7 @@ let data = [
         level: 1,
         priceGold: 20,
         priceCoins: 2,
-        time: 20, //ČAS ZJISTIT
+        time: 35, //ČAS ZJISTIT
         finishDateTime: "",
         icon: "fas fa-cubes"
     },
@@ -25,10 +25,10 @@ let data = [
         name: "Kasárna",
         link: "barracks",
         active: "false",
-        level: 1,
+        level: 0,
         priceGold: 10,
         priceCoins: 1,
-        time: 9, //ČAS ZJISTIT
+        time: 55, //ČAS ZJISTIT
         finishDateTime: "",
         icon: "fas fa-chess-rook",
         soldiers_type: [
@@ -41,6 +41,7 @@ let data = [
                 attack: 3,
                 defence: 3,
                 finishDateTime: "",
+                inProccess: 0,
                 icon: "fas fa-chess-pawn"
             },
             {
@@ -52,6 +53,7 @@ let data = [
                 attack: 2,
                 defence: 5,
                 finishDateTime: "",
+                inProccess: 0,
                 icon: "fas fa-bullseye"
             },
             {
@@ -63,6 +65,7 @@ let data = [
                 attack: 6,
                 defence: 4,
                 finishDateTime: "",
+                inProccess: 0,
                 icon: "fas fa-horse-head"
             }
         ],
@@ -71,10 +74,10 @@ let data = [
         name: "Mincovna",
         link: "mint",
         active: "false",
-        level: 1,
+        level: 0,
         priceGold: 28,
         priceCoins: 3,
-        time: 60, //ČAS ZJISTIT
+        time: 65, //ČAS ZJISTIT
         finishDateTime: "",
         icon: "fas fa-coins",
         coin: {
@@ -85,7 +88,7 @@ let data = [
 ];
 let settings = {
     townName: "Vesnice",
-    userName: "hráč 1245",
+    userName: null,
     activeLink: "castle",
     activeBuildState: false,
     activeRecruitState: false,
@@ -95,9 +98,9 @@ let settings = {
     gold: 60,
     coins: 0,
     army: {
-        swordsmans: 50,
-        archers: 34,
-        horsemans: 12
+        swordsmans: 5,
+        archers: 5,
+        horsemans: 0
     },
     event_attack: {
         time: 2,
@@ -108,9 +111,15 @@ let settings = {
         },
         arriveDate: "",
         attackState: false,
-    }
+    },
+    speedUp: 1
 };
 
 export function getData() {
     return {'data': data, 'settings': settings};
+}
+
+export function setData(d) {
+    data = d.data;
+    settings = d.settings;
 }

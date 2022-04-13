@@ -7,6 +7,7 @@ export function displayBuildTime(t, date = null) {
             return "Dokončeno";
         }
     }
+    if (t < 0) t = 0;
     const sec = parseInt(t, 10); // convert value to number if it's string
     let hours = Math.floor(sec / 3600); // get hours
     let minutes = Math.floor((sec - (hours * 3600)) / 60); // get minutes
@@ -61,4 +62,14 @@ export function fight(userArmy, enemyArmy) {
     if (userArmy.horsemans < 0) userArmy.horsemans = 0;
 
     return userArmy;
+}
+
+export function save(data) {
+    let d = JSON.stringify(data);
+    localStorage.setItem('_gameData', d);
+}
+
+export function load() {
+    let d = localStorage.getItem('_gameData');
+    return JSON.parse(d);
 }

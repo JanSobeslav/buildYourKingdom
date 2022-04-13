@@ -1,4 +1,4 @@
-import { displayBuildTime, createElement, getElement } from "./glMethods.js";
+import { displayBuildTime, createElement, getElement, save } from "./glMethods.js";
 import { buildNavigation as nav } from "./navigation.js";
 import { buildBarracks as barracks, buildBarracks } from "./barracks.js";
 import { getData } from "./data.js";
@@ -12,8 +12,8 @@ class Model {
     }
 
     getBarracks() {
-        const barracks = this.data.filter(b => { if (b.link === 'barracks') return b; });
-        return barracks[0];
+        const [barracks] = this.data.filter(b => { if (b.link === 'barracks') return b; });
+        return barracks;
     }
 
     bindSubmit(data) {
@@ -21,25 +21,17 @@ class Model {
         const unitIndex = this.data[buildingIndex].soldiers_type.findIndex(u => u.link == data.unitType);
         const finishDate = new Date();
         finishDate.setSeconds(finishDate.getSeconds() + data.totalTime);
-
-        setTimeout(() => {
-            this.settings.army.swordsmans += data.unitSum;
-            if (this.settings.activeLink === 'barracks') {
-                const content = getElement('#content');
-                content.innerHTML = '';
-                barracks('#content', this.allData);
-            }
-        }, data.totalTime * 1000);
         this.settings.gold -= data.totalPrice;
         this.data[buildingIndex].soldiers_type[unitIndex].finishDateTime = finishDate;
+        this.data[buildingIndex].soldiers_type[unitIndex].inProccess = data.unitSum;
         this.settings.activeRecruitState = true;
-
-        console.log(this.settings);
+        save({ data: this.data, settings: this.settings });
     }
 
     bindRecruitState(state, building) {
         this.settings.activeRecruitState = state;
         this.settings.recruitingUpgradingState = building;
+        save({ data: this.data, settings: this.settings });
     }
 }
 
@@ -118,7 +110,7 @@ class View {
     displayData(data, building, settings, submitHandler, activeRecruitStateHandler) {
         this.modalHeaderTitle.innerHTML = data.name;
         let maxRecruitSol = (settings.gold - settings.gold % data.priceGold) / data.priceGold;
-        let disTime = data.time * Math.pow(building.level > 0 ? building.level : building.level + 1, 3);
+        let disTime = data.time - Math.pow(building.level, 2);
         this.bTcContainer.innerHTML = `
         <div class="row justify-content-around mt-4">
             <div class="col-3">
@@ -203,20 +195,6 @@ class View {
                 };
                 submitHandler(dataSubmit);
                 activeRecruitStateHandler(true, data.link);
-                const countdown = setInterval(() => {
-                    let bTime = displayBuildTime(disTime, data.finishDateTime);
-                    let timeElement = getElement('#recruitTime-' + data.link);
-                    if (timeElement) timeElement.innerHTML = `<strong style="color: darkgreen;">${bTime}</strong>`;
-
-                    if (bTime == "Stavba dokončena") {
-                        activeRecruitStateHandler(false, "");
-                        clearInterval(countdown);
-                        if (settings.activeLink === 'barracks') {
-                            getElement('#content').innerHTML = '';
-                            buildBarracks('#content', getData());
-                        }
-                    }
-                }, 100);
                 getElement('#content').innerHTML = '';
                 buildBarracks('#content', getData());
                 this.dialog.close();

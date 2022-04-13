@@ -1,4 +1,4 @@
-import { displayBuildTime, createElement, getElement } from "./glMethods.js";
+import { displayBuildTime, createElement, getElement, save } from "./glMethods.js";
 import { buildNavigation as nav } from "./navigation.js";
 import { buildEventAttack as eventAttack } from "./eventAttack.js";
 
@@ -16,6 +16,7 @@ class Model {
     bindActiveBuildState(state, building) {
         this.settings.activeBuildState = state;
         this.settings.buildingUpgradingState = building;
+        save({ data: this.data, settings: this.settings });
     }
 
     bindFinishTimeState(time, link) {
@@ -27,14 +28,17 @@ class Model {
         } else {
             this.data[index].finishDateTime = "";
         }
+        save({ data: this.data, settings: this.settings });
     }
 
     bindDicreaseGold(gold) {
         this.settings.gold -= gold;
+        save({ data: this.data, settings: this.settings });
     }
 
     bindDicreaseCoins(coins) {
         this.settings.coins -= coins;
+        save({ data: this.data, settings: this.settings });
     }
 }
 
@@ -156,7 +160,7 @@ class View {
                 <input type="radio" name="flexRadioDefault-${budova.link}" value="inputCoins" id="inputCoins-${budova.link}" />
             </div>
             <div class="col-2" id="time-${budova.link}">
-                ${displayBuildTime((budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3)))}
+                ${displayBuildTime((budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3))/settings.speedUp)}
             </div>
             <div class="col-2">
                 <button id="level-${budova.link}" ${settings.activeBuildState && 'disabled'} class="btn btn-primary upgrade">
@@ -165,7 +169,9 @@ class View {
             `;
             this.tabPaneContBuildings.append(row);
 
-            document.getElementById("level-" + budova.link).addEventListener('click', () => {
+            const upgradeBtn = document.getElementById("level-" + budova.link);
+
+            upgradeBtn.addEventListener('click', () => {
                 let radioGold = getElement('#inputGold-' + budova.link);
                 let radioCoins = getElement('#inputCoins-' + budova.link);
                 if ((budova.priceGold < settings.gold && radioGold.checked) || (budova.priceCoins < settings.coins && radioCoins.checked)) {
@@ -174,46 +180,17 @@ class View {
                     } else if (radioCoins.checked) {
                         dicreaseCoinsHandler(buildingCoinsCost);
                     }
-                    
+
 
                     getElement('#game-navigation').innerHTML = '';
                     nav('#game-navigation', { data: data, settings: settings });
 
                     activeBuildStateHandler(true, budova.link);
 
-                    let btnLevel = getElement('#level-' + budova.link);
-                    let btnsLevel = document.getElementsByClassName('upgrade');
-
-                    for (const btn of btnsLevel) {
-                        btn.disabled = true;
-                    }
-
-                    btnLevel.innerHTML = `Level ${budova.level + 2}`;
-
-                    let time = budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3);
+                    let time = (budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3))/settings.speedUp;
                     finishTimeHandler(time, budova.link);
 
-                    const countdown = setInterval(() => {
-                        let bTime = displayBuildTime(time, budova.finishDateTime);
-                        let timeElement = getElement('#time-' + budova.link);
-
-                        if (timeElement) timeElement.innerHTML = `<strong style="color: darkgreen;">${bTime}</strong>`;
-
-                        if (bTime == "Dokončeno") {
-                            budova.level++;
-                            activeBuildStateHandler(false, "");
-                            finishTimeHandler("", budova.link);
-                            clearInterval(countdown);
-                            if (settings.activeLink === 'castle') {
-                                this.app.innerHTML = "";
-                                buildCastle('#content', { data: data, settings: settings });
-                            }
-                            if (budova.link === 'barracks' && budova.level % 2 === 0 && settings.event_attack.attackState === false) {
-                                settings.event_attack.attackState = true;
-                                eventAttack('#root', {data, settings});
-                            }
-                        }
-                    }, 100);
+                    upgrading(time);
                 } else {
                     let timeEl = getElement('#time-' + budova.link);
                     if (radioGold.checked || radioCoins.checked) {
@@ -229,8 +206,44 @@ class View {
                     }
 
                 }
-
             });
+            if (settings.activeBuildState && settings.buildingUpgradingState === budova.link) {
+                upgrading();
+            }
+
+            function upgrading(time = 0) {
+                let btnLevel = getElement('#level-' + budova.link);
+                let btnsLevel = document.getElementsByClassName('upgrade');
+
+                for (const btn of btnsLevel) {
+                    btn.disabled = true;
+                }
+
+                btnLevel.innerHTML = `Level ${budova.level + 2}`;
+
+                const countdown = setInterval(() => {
+                    let bTime = displayBuildTime(time, budova.finishDateTime);
+                    let timeElement = getElement('#time-' + budova.link);
+
+                    if (timeElement) timeElement.innerHTML = `<strong style="color: darkgreen;">${bTime}</strong>`;
+
+                    if (bTime == "Dokončeno") {
+                        budova.level++;
+                        activeBuildStateHandler(false, "");
+                        finishTimeHandler("", budova.link);
+                        
+                        clearInterval(countdown);
+                        if (settings.activeLink === 'castle') {
+                            getElement('#content').innerHTML = '';
+                            buildCastle('#content', { data, settings });
+                        }
+                        if (budova.link === 'barracks' && budova.level % 2 === 0 && settings.event_attack.attackState === false) {
+                            settings.event_attack.attackState = true;
+                            eventAttack('#root', { data, settings });
+                        }
+                    }
+                }, 100);
+            }
         }
 
     }

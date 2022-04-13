@@ -69,7 +69,10 @@ class View {
     displaySidenavItems(data, settings) {
         const menuHeading = createElement('div', ['sb-sidenav-menu-heading']);
         menuHeading.textContent = 'Budovy';
-        const activeLink = settings.activeLink ? settings.activeLink : 'castle';
+        let activeLink = settings.activeLink ? settings.activeLink : 'castle';
+        let urlLink = window.location.href;
+        [url, urlLink] = urlLink.split('/#/');
+        if (activeLink !== urlLink) activeLink = urlLink;
         this.menu.append(menuHeading);
         for (const d of data) {
             const a = createElement('a', ['nav-link', d.link]);
@@ -81,7 +84,6 @@ class View {
             this.menu.append(a);
             this._initItemsLink(d.link);
         }
-
         const [building] = data.filter(b => b.link === activeLink);
         this.displayContent(activeLink, 'content', building);
         getElement('#serverTime').innerHTML = serverTime();

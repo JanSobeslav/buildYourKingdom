@@ -1,4 +1,4 @@
-import { createElement, getElement, serverTime } from "./glMethods.js";
+import { createElement, getElement, save, serverTime } from "./glMethods.js";
 import { getData } from "./data.js";
 import { buildCastle as castle } from "./castle.js";
 import { buildGoldMine as mine } from "./gold-mine.js";
@@ -14,10 +14,12 @@ class Model {
 
     bindMenuItemsChange(callback) {
         this.onMenuItemsChange = callback;
+        save({ data: this.data, settings: this.settings });
     }
 
     linkChange(link) {
         this.settings.activeLink = link;
+        save({ data: this.data, settings: this.settings });
     }
 }
 
@@ -67,18 +69,21 @@ class View {
     displaySidenavItems(data, settings) {
         const menuHeading = createElement('div', ['sb-sidenav-menu-heading']);
         menuHeading.textContent = 'Budovy';
+        const activeLink = settings.activeLink ? settings.activeLink : 'castle';
         this.menu.append(menuHeading);
         for (const d of data) {
             const a = createElement('a', ['nav-link', d.link]);
             a.href = '#/' + d.link;
-            if (settings.activeLink === d.link) {
+            if (activeLink === d.link) {
                 a.classList.add('active');
             }
             a.innerHTML = '<div class="sb-nav-link-icon"><i class="' + d.icon + '"></i></div>' + d.name;
             this.menu.append(a);
             this._initItemsLink(d.link);
         }
-        this.displayContent('castle', 'content', data[0]);
+
+        const [building] = data.filter(b => b.link === activeLink);
+        this.displayContent(activeLink, 'content', building);
         getElement('#serverTime').innerHTML = serverTime();
     }
 
@@ -102,8 +107,8 @@ class View {
                     content.innerHTML = '';
                     a.classList.add("active");
                     handler(link);
-                    const building = data.filter(b => {if (b.link === link) return b;});
-                    this.displayContent(link, content.id, building[0]);
+                    const [building] = data.filter(b => {if (b.link === link) return b;});
+                    this.displayContent(link, content.id, building);
                 } else {
                     a.classList.remove("active");
                 }

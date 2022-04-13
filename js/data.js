@@ -95,6 +95,8 @@ let settings = {
     activeMintState: false,
     buildingUpgradingState: "",
     recruitingUpgradingState: "",
+    startGameDate: null,
+    hoursFromStart: 0,
     gold: 60,
     coins: 0,
     army: {

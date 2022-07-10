@@ -1,4 +1,4 @@
-import { displayBuildTime, createElement, getElement, save } from "./glMethods.js";
+import { displayBuildTime, createElement, getElement, save } from "./glFunctions.js";
 import { buildNavigation as nav } from "./navigation.js";
 import { buildEventAttack as eventAttack } from "./eventAttack.js";
 
@@ -9,19 +9,19 @@ class Model {
         this.settings = data.settings;
     }
 
-    bindDisplayBuildings(callback) {
-        this.onDisplayBuildings(callback);
+    displayBuildings(callback) {
+        this.handleDisplayBuildings(callback);
     }
 
-    bindActiveBuildState(state, building) {
+    changeBuildState(state, building) {
         this.settings.activeBuildState = state;
         this.settings.buildingUpgradingState = building;
         save({ data: this.data, settings: this.settings });
     }
 
-    bindFinishTimeState(time, link) {
+    changeFinishTimeState(time, link) {
         const index = this.data.findIndex(b => b.link === link);
-        if (time !== "") {
+        if (time) {
             let date = new Date();
             date.setSeconds(date.getSeconds() + time);
             this.data[index].finishDateTime = date;
@@ -31,12 +31,12 @@ class Model {
         save({ data: this.data, settings: this.settings });
     }
 
-    bindDicreaseGold(gold) {
+    decreaseGold(gold) {
         this.settings.gold -= gold;
         save({ data: this.data, settings: this.settings });
     }
 
-    bindDicreaseCoins(coins) {
+    decreaseCoins(coins) {
         this.settings.coins -= coins;
         save({ data: this.data, settings: this.settings });
     }
@@ -51,74 +51,20 @@ class View {
 
         this.h1 = createElement('h1', ['mt-4']);
 
-        //NEFUNKČNÍ
         this.infoButton = createElement('button');
-        this.infoButton.setAttribute('type', 'button');
-        this.infoButton.setAttribute('data-bs-container', 'body');
-        this.infoButton.setAttribute('data-bs-toggle', 'popover');
-        this.infoButton.setAttribute('data-bs-placement', 'right');
-        this.infoButton.setAttribute('style', 'background-color: transparent; border: solid transparent;');
-        this.infoButton.setAttribute('data-bs-content', ('Hrad je místo, odkud řídíš své město. Především tu stavíš a vylepšuješ' +
-            'budovy, ale také máš možnost zde vidět svůj postup. Kolik si rekrutoval jednotek, kolik stupňů budov postavil,' +
-            'kolik zlata jsi vytěžil, nebo kolik mincí si vyrazil.'));
+        this.infoButton.setAttribute('style', 'background-color: transparent; border: solid transparent; cursor: help;');
+        this.infoButton.setAttribute('title', ('Hrad je místo, odkud řídíš své město. Především tu stavíš a vylepšuješ ' +
+            'budovy, ale také máš možnost zde vidět svůj postup.'));
         this.infoButton.innerHTML = '<i class="fas fa-info-circle"></i>';
 
-        this.nav = createElement('nav');
+        this.contentBuildings = createElement('div', ['container', 'mt-4', 'ml-4']);
 
-        this.navTabs = createElement('div', ['nav', 'nav-tabs']);
-
-        this.navTabsBtnBuild = createElement('button', ['nav-link', 'active']);
-        this.navTabsBtnBuild.id = 'nav-buildings-tab';
-        this.navTabsBtnBuild.textContent = 'Budovy';
-        this.navTabsBtnBuild.setAttribute('data-bs-toggle', 'tab');
-        this.navTabsBtnBuild.setAttribute('data-bs-target', '#nav-buildings');
-        this.navTabsBtnBuild.setAttribute('type', 'button');
-        this.navTabsBtnBuild.setAttribute('role', 'tab');
-        this.navTabsBtnBuild.setAttribute('aria-controls', 'nav-buildings');
-        this.navTabsBtnBuild.setAttribute('aria-selected', 'true');
-
-        this.navTabsBtnProgress = createElement('button', ['nav-link']);
-        this.navTabsBtnProgress.id = 'nav-progress-tab';
-        this.navTabsBtnProgress.textContent = 'Postup';
-        this.navTabsBtnProgress.setAttribute('data-bs-toggle', 'tab');
-        this.navTabsBtnProgress.setAttribute('data-bs-target', '#nav-progress');
-        this.navTabsBtnProgress.setAttribute('type', 'button');
-        this.navTabsBtnProgress.setAttribute('role', 'tab');
-        this.navTabsBtnProgress.setAttribute('aria-controls', 'nav-progress');
-        this.navTabsBtnProgress.setAttribute('aria-selected', 'true');
-
-        this.navTabs.append(this.navTabsBtnBuild, this.navTabsBtnProgress);
-
-        this.nav.append(this.navTabs);
-
-        this.tabContent = createElement('div', ['tab-content']);
-        this.tabContent.id = 'nav-tabContent';
-
-        this.tabPane = createElement('div', ['tab-pane', 'fade', 'show', 'active']);
-        this.tabPane.id = 'nav-buildings';
-        this.tabPane.role = 'tabpanel';
-        this.tabPane.setAttribute('aria-labelledby', 'nav-buildings-tab');
-
-        this.tabPaneContBuildings = createElement('div', ['container', 'mt-4', 'ml-4']);
-
-        //generuje se v displayBuildings
-
-        this.tabPane.append(this.tabPaneContBuildings);
-
-        this.tabPane2 = createElement('div', ['tab-pane', 'fade', 'show']);
-        this.tabPane2.id = 'nav-progress';
-        this.tabPane2.role = 'tabpanel';
-        this.tabPane2.setAttribute('aria-labelledby', 'nav-progress-tab');
-        this.tabPane2.textContent = '--- Coming Soon! ---';
-
-        this.tabContent.append(this.tabPane, this.tabPane2);
-
-        this.container.append(this.h1, this.infoButton, this.nav, this.tabContent);
+        this.container.append(this.h1, this.infoButton, this.contentBuildings);
 
         this.app.append(this.container);
     }
 
-    displayBuildings(activeBuildStateHandler, finishTimeHandler, dicreaseGoldHandler, dicreaseCoinsHandler, data, settings) {
+    bindDisplayBuildings(activeBuildStateHandler, finishTimeHandler, decreaseGoldHandler, decreaseCoinsHandler, data, settings) {
         let i = data.findIndex(data => data.link === 'castle');
         this.h1.textContent = data[i].name;
         let tpcRowHeader = createElement('div', ['row', 'justify-content-around', 'mb-4']);
@@ -130,20 +76,27 @@ class View {
             <b>Stupeň budovy</b>
         </div>
         <div class="col-2">
-            <b>Cena dalšího stupně</b>
+            <b>Cena dalšího stupně</b><br>
+            <input type="radio" name="flexRadioDefault" value="inputGold" id="inputGold" checked/>
+                <i class="fas fa-cube" style="color: rgb(139, 126, 0);"></i> /
+                <i class="fas fa-circle" style="color: rgb(139, 126, 0);"></i>
+                <input type="radio" name="flexRadioDefault" value="inputCoins" id="inputCoins" />
         </div>
         <div class="col-2">
-            <b>Čas pro stavbu</b>
+            <b>Čas pro stavbu</b><br>
+            <span id="errorMessage"></span>
         </div>
         <div class="col-2">
             <b>Vylepšit</b>
         </div>
         `;
-        this.tabPaneContBuildings.append(tpcRowHeader);
+        this.contentBuildings.append(tpcRowHeader);
         let castleLevel = 0;
         for (let budova of data) {
             let row = createElement('div', ['row', 'justify-content-around', 'mb-2']);
             const buildingCoinsCost = budova.level == 0 ? budova.priceCoins : Math.ceil(budova.priceGold / 10) * budova.level;
+            const buildingGoldCost = budova.level == 0 ? budova.priceGold : budova.priceGold * budova.level;
+            const buildingUpgradeTime = (budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3))/settings.speedUp;
 
             if (budova.link === 'castle') castleLevel = budova.level;
             row.innerHTML = `
@@ -154,62 +107,43 @@ class View {
                 ${budova.level}
             </div>
             <div class="col-2">
-                <input type="radio" name="flexRadioDefault-${budova.link}" value="inputGold" id="inputGold-${budova.link}" checked/>
-                ${budova.level == 0 ? budova.priceGold : budova.priceGold * budova.level} <i class="fas fa-cube" style="color: rgb(139, 126, 0);"></i> /
+                ${buildingGoldCost} <i class="fas fa-cube" style="color: rgb(139, 126, 0);"></i> /
                 ${buildingCoinsCost} <i class="fas fa-circle" style="color: rgb(139, 126, 0);"></i>
-                <input type="radio" name="flexRadioDefault-${budova.link}" value="inputCoins" id="inputCoins-${budova.link}" />
             </div>
             <div class="col-2" id="time-${budova.link}">
-                ${displayBuildTime((budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3))/settings.speedUp)}
+                ${displayBuildTime(buildingUpgradeTime)}
             </div>
             <div class="col-2">
                 <button id="level-${budova.link}" ${settings.activeBuildState && 'disabled'} class="btn btn-primary upgrade">
                 ${(budova.level == 0 && settings.activeBuildState == false) ? 'Postavit' : ((settings.activeBuildState && settings.buildingUpgradingState == budova.link) ? 'Level ' + (budova.level + 2) : 'Level ' + (budova.level + 1))}</button>
             </div>
             `;
-            this.tabPaneContBuildings.append(row);
+            this.contentBuildings.append(row);
 
             const upgradeBtn = document.getElementById("level-" + budova.link);
 
             upgradeBtn.addEventListener('click', () => {
-                let radioGold = getElement('#inputGold-' + budova.link);
-                let radioCoins = getElement('#inputCoins-' + budova.link);
-                if ((budova.priceGold < settings.gold && radioGold.checked) || (budova.priceCoins < settings.coins && radioCoins.checked)) {
-                    if (radioGold.checked) {
-                        dicreaseGoldHandler(budova.priceGold);
-                    } else if (radioCoins.checked) {
-                        dicreaseCoinsHandler(buildingCoinsCost);
-                    }
-
-
+                let radioGold = getElement('#inputGold');
+                let radioCoins = getElement('#inputCoins');
+                if ((buildingGoldCost < settings.gold && radioGold.checked) || (buildingCoinsCost < settings.coins && radioCoins.checked)) {
+                    radioGold.checked ? decreaseGoldHandler(buildingGoldCost) : decreaseCoinsHandler(buildingCoinsCost);
                     getElement('#game-navigation').innerHTML = '';
                     nav('#game-navigation', { data: data, settings: settings });
 
                     activeBuildStateHandler(true, budova.link);
-
-                    let time = (budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3))/settings.speedUp;
-                    finishTimeHandler(time, budova.link);
-
-                    upgrading(time);
+                    finishTimeHandler(buildingUpgradeTime, budova.link);
+                    upgrading(buildingUpgradeTime);
                 } else {
-                    let timeEl = getElement('#time-' + budova.link);
+                    let timeEl = getElement('#errorMessage');
                     if (radioGold.checked || radioCoins.checked) {
-                        timeEl.innerHTML = `<span style="color: red">Nemáš dostatek zlata/mincí!</span>`;
+                        timeEl.innerHTML = `<span style="color: red">Nemáš zlato/mince!</span>`;
                         setTimeout(() => {
-                            timeEl.innerHTML = displayBuildTime((budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3)));
-                        }, 5000);
-                    } else {
-                        timeEl.innerHTML = `<span style="color: red">Vyber čím budeš platit!</span>`;
-                        setTimeout(() => {
-                            timeEl.innerHTML = displayBuildTime((budova.time * Math.pow(budova.level > 0 ? budova.level : budova.level + 1, 3) - Math.pow(castleLevel, 3)));
+                            timeEl.innerHTML = displayBuildTime(buildingUpgradeTime);
                         }, 5000);
                     }
-
                 }
             });
-            if (settings.activeBuildState && settings.buildingUpgradingState === budova.link) {
-                upgrading();
-            }
+            if (settings.activeBuildState && settings.buildingUpgradingState === budova.link) upgrading();
 
             function upgrading(time = 0) {
                 let btnLevel = getElement('#level-' + budova.link);
@@ -221,7 +155,7 @@ class View {
 
                 btnLevel.innerHTML = `Level ${budova.level + 2}`;
 
-                const countdown = setInterval(() => {
+                const intervalUpgrading = setInterval(() => {
                     let bTime = displayBuildTime(time, budova.finishDateTime);
                     let timeElement = getElement('#time-' + budova.link);
 
@@ -230,9 +164,9 @@ class View {
                     if (bTime == "Dokončeno") {
                         budova.level++;
                         activeBuildStateHandler(false, "");
-                        finishTimeHandler("", budova.link);
+                        finishTimeHandler(null, budova.link);
                         
-                        clearInterval(countdown);
+                        clearInterval(intervalUpgrading);
                         if (settings.activeLink === 'castle') {
                             getElement('#content').innerHTML = '';
                             buildCastle('#content', { data, settings });
@@ -254,33 +188,33 @@ class Controller {
         this.model = model;
         this.view = view;
 
-        this.onDisplayBuildings(
+        this.handleDisplayBuildings(
             this.handleActiveBuildState,
-            this.finishTimeHandler,
+            this.handleFinishTime,
             this.handleDecreaseGold,
             this.handleDecreaseCoins,
             this.model.data,
             this.model.settings);
     }
 
-    onDisplayBuildings = (activeBuildStateHandler, finishTimeHandler, dicreaseGoldHandler, dicreaseCoinsHandler, data, settings) => {
-        this.view.displayBuildings(activeBuildStateHandler, finishTimeHandler, dicreaseGoldHandler, dicreaseCoinsHandler, data, settings);
+    handleDisplayBuildings = (activeBuildStateHandler, finishTimeHandler, decreaseGoldHandler, decreaseCoinsHandler, data, settings) => {
+        this.view.bindDisplayBuildings(activeBuildStateHandler, finishTimeHandler, decreaseGoldHandler, decreaseCoinsHandler, data, settings);
     }
 
     handleActiveBuildState = (state, building) => {
-        this.model.bindActiveBuildState(state, building);
+        this.model.changeBuildState(state, building);
     }
 
-    finishTimeHandler = (dateTime, link) => {
-        this.model.bindFinishTimeState(dateTime, link);
+    handleFinishTime = (dateTime = null, link) => {
+        this.model.changeFinishTimeState(dateTime, link);
     }
 
     handleDecreaseGold = gold => {
-        this.model.bindDicreaseGold(gold);
+        this.model.decreaseGold(gold);
     }
 
     handleDecreaseCoins = coins => {
-        this.model.bindDicreaseCoins(coins);
+        this.model.decreaseCoins(coins);
     }
 }
 

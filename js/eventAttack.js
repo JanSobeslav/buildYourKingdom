@@ -1,4 +1,4 @@
-import { createElement, getElement, displayBuildTime, fight } from "./glMethods.js";
+import { createElement, getElement, displayBuildTime, fight, save } from "./glFunctions.js";
 import { buildNavigation as nav } from "./navigation.js";
 
 class Model {
@@ -6,20 +6,30 @@ class Model {
         this.allData = data;
         this.data = data.data;
         this.settings = data.settings;
+
+        this.settings.event_attack.attackState = true;
     }
 
-    bindFinishTimeState(time) {
+    changeFinishTimeState(time) {
         if (time !== "") {
             let date = new Date();
-            date.setSeconds(date.getSeconds() + time);
+            date.setSeconds(date.getSeconds() + (time * this.settings.hoursFromStart));
             this.settings.event_attack.arriveDate = date;
         } else {
             this.settings.event_attack.arriveDate = "";
         }
+        save({ data: this.data, settings: this.settings });
     }
 
-    bindArmy(army) {
+    setArmy(army) {
         this.settings.army = army;
+        this.settings.event_attack.attackState = false;
+        save({ data: this.data, settings: this.settings });
+    }
+
+    decreaseGold(gold) {
+        this.settings.gold -= gold;
+        save({ data: this.data, settings: this.settings });
     }
 }
 
@@ -39,9 +49,10 @@ class View {
         this.app.append(this.alert);
     }
 
-    displayEvent(data, settings, time, setArmy) {
+    bindDisplayEvent(data, settings, timeHandler, setArmy, decreaseGold) {
         const [barracks] = data.filter(b => b.link === 'barracks');
-        time((settings.event_attack.time * barracks.level));
+        timeHandler(settings.event_attack.time * (Math.floor(Math.random() * 6) + 1) + settings.hoursFromStart);
+        const numOfUnits = settings.event_attack.units + (2 * settings.hoursFromStart);
         this.alertContent.innerHTML = `
         <div class="row">
             <div class="col-6">
@@ -54,24 +65,23 @@ class View {
             <b>Počet jednotek</b>
             </div>
             <div class="col-6">
-                ${settings.event_attack.units.swordsmans + settings.event_attack.units.archers + settings.event_attack.units.horsemans}
+                ${numOfUnits}
             </div>
         </div>
         `;
 
         const countdown = setInterval(() => {
-            let bTime = displayBuildTime(time, settings.event_attack.arriveDate);
+            let bTime = displayBuildTime(settings.event_attack.time, settings.event_attack.arriveDate);
             let timeElement = getElement('#time-event_attack');
-
             if (timeElement) timeElement.innerHTML = bTime;
-
-            if (bTime == "Dokončeno") {
-                setArmy(fight(settings.army, settings.event_attack.units));
+            if (bTime == "Dokončeno" && settings.event_attack.attackState) {
+                const fightResults = fight(settings.army, numOfUnits);
+                setArmy(fightResults.userArmy);
+                if (fightResults.enemyArmy > 0) decreaseGold(fightResults.enemyArmy);
                 getElement('#game-navigation').innerHTML = '';
                 nav('#game-navigation', { data: data, settings: settings });
-                settings.event_attack.attackState = false;
-                this.alert.remove();
                 clearInterval(countdown);
+                this.alert.remove();
             }
         }, 100);
     }
@@ -83,19 +93,23 @@ class Controller {
         this.model = model;
         this.view = view;
 
-        this.onDisplayEvent(this.model.data, this.model.settings, this.bindFinishTime, this.bindArmy);
+        this.handleDisplayEvent(this.model.data, this.model.settings, this.handleFinishTime, this.handleArmy, this.handleDecreaseGold);
     }
 
-    onDisplayEvent = (data, settings, bindArriveTime, bindArmy) => {
-        this.view.displayEvent(data, settings, bindArriveTime, bindArmy);
+    handleDisplayEvent = (data, settings, bindArriveTime, bindArmy, decreaseGoldHandler) => {
+        this.view.bindDisplayEvent(data, settings, bindArriveTime, bindArmy, decreaseGoldHandler);
     }
 
-    bindFinishTime = (time) => {
-        this.model.bindFinishTimeState(time);
+    handleFinishTime = (time) => {
+        this.model.changeFinishTimeState(time);
     }
 
-    bindArmy = (army) => {
-        this.model.bindArmy(army);
+    handleArmy = (army) => {
+        this.model.setArmy(army);
+    }
+
+    handleDecreaseGold = (gold) => {
+        this.model.decreaseGold(gold);
     }
 }
 

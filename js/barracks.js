@@ -1,4 +1,4 @@
-import { displayBuildTime, createElement, getElement, save } from "./glMethods.js";
+import { displayBuildTime, createElement, getElement, save } from "./glFunctions.js";
 import { buildDialog as dialog } from "./dialog.js";
 import { buildNavigation as nav } from "./navigation.js";
 import { getData } from "./data.js";
@@ -10,11 +10,11 @@ class Model {
         this.settings = data.settings;
     }
 
-    bindDisplayUnits(callback) {
-        this.onDisplayUnits(callback);
+    displayUnits(callback) {
+        this.handleDisplayUnits(callback);
     }
 
-    bindRecruitState(state, link,  unitLink) {
+    changeRecruitState(state, link,  unitLink) {
         this.settings.activeRecruitState = state;
         this.settings.recruitingUpgradingState = link;
         const indexBarracks = this.data.findIndex(b => b.link === 'barracks');
@@ -23,7 +23,7 @@ class Model {
         save({ data: this.data, settings: this.settings });
     }
 
-    bindAddArmy(count, type) {
+    addArmy(count, type) {
         const [barracks] = this.data.filter(b => b.link === 'barracks');
         const [unit] = barracks.soldiers_type.filter(s => s.link === type);
         switch (type) {
@@ -46,8 +46,13 @@ class View {
         this.app = getElement(elName);
 
         this.container = createElement('div', ['container-fluid', 'px-4']);
+        this.container.id = "barracks-cont";
 
         this.h1Title = createElement('h1', ['mt-4', 'mb-4']);
+        this.infoButton = createElement('button');
+        this.infoButton.setAttribute('style', 'background-color: transparent; border: solid transparent; cursor: help;');
+        this.infoButton.setAttribute('title', ('V kasárnách můžeš rekrutovat nové jednotky a připravit se tak na těžké časy, které mohou nastat.'));
+        this.infoButton.innerHTML = '<i class="fas fa-info-circle"></i>';
         this.hr = createElement('hr');
 
         this.content = createElement('div');
@@ -77,14 +82,14 @@ class View {
         //výpis jednotek
 
         this.content.append(this.contentHead);
-        this.container.append(this.h1Title, this.hr, this.content);
+        this.container.append(this.h1Title, this.infoButton, this.hr, this.content);
         this.modal = createElement('div');
         this.modal.id = "modal-container";
 
         this.app.append(this.container, this.modal);
     }
 
-    displayUnits(data, settings, activeRecruitStateHandler, addToArmy) {
+    bindDisplayUnits(data, settings, activeRecruitStateHandler, addToArmy) {
         let i = data.findIndex(data => data.link === 'barracks');
         this.h1Title.innerHTML = data[i].name;
         for (const unit of data[i].soldiers_type) {
@@ -122,7 +127,7 @@ class View {
                 dialog("#modal-container", { data: data, settings: settings }, unit);
             });
             if (settings.activeRecruitState && settings.recruitingUpgradingState === unit.link) {
-                const countdown = setInterval(() => {
+                const interval = setInterval(() => {
                     let bTime = displayBuildTime(0, unit.finishDateTime);
                     let timeElement = getElement('#recruitTime-' + unit.link);
                     if (timeElement) timeElement.innerHTML = `<strong style="color: darkgreen;">${bTime}</strong>`;
@@ -130,7 +135,7 @@ class View {
                     if (bTime == "Dokončeno") {
                         activeRecruitStateHandler(false, "", unit.link);
                         addToArmy(unit.inProccess, unit.link);
-                        clearInterval(countdown);
+                        clearInterval(interval);
                         timeElement.innerHTML = '';
                         if (settings.activeLink === 'barracks') {
                             getElement('#content').innerHTML = '';
@@ -150,20 +155,20 @@ class Controller {
         this.model = model
         this.view = view
 
-        this.onDisplayUnits(this.model.data, this.model.settings, this.handleRecruitState, this.addArmy);
+        this.handleDisplayUnits(this.model.data, this.model.settings, this.handleRecruitState, this.handleAddArmy);
 
     }
 
-    onDisplayUnits = (data, settings, activeRecruitStateHandler, addArmy) => {
-        this.view.displayUnits(data, settings, activeRecruitStateHandler, addArmy);
+    handleDisplayUnits = (data, settings, activeRecruitStateHandler, addArmy) => {
+        this.view.bindDisplayUnits(data, settings, activeRecruitStateHandler, addArmy);
     }
 
     handleRecruitState = (state, building, unitLink) => {
-        this.model.bindRecruitState(state, building, unitLink);
+        this.model.changeRecruitState(state, building, unitLink);
     }
 
-    addArmy = (count, unit_type) => {
-        this.model.bindAddArmy(count, unit_type);
+    handleAddArmy = (count, unit_type) => {
+        this.model.addArmy(count, unit_type);
     }
 
 }

@@ -1,4 +1,4 @@
-import { createElement, getElement } from "./glMethods.js";
+import { createElement, getElement } from "./glFunctions.js";
 
 class Model {
     constructor(data) {
@@ -7,8 +7,8 @@ class Model {
         this.settings = data.settings;
     }
 
-    bindDisplayGoldMineData(callback) {
-        this.onDisplayGoldMineData(callback);
+    displayGoldMineData(callback) {
+        this.handleDisplayGoldMineData(callback);
     }
 }
 
@@ -21,37 +21,35 @@ class View {
         this.h1Title = createElement('h1', ['mt-4', 'mb-4']);
         this.hr = createElement('hr');
 
-        // <button type="button" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="right"
-        // style="background-color: transparent; border: solid transparent;" data-bs-content="Ve tvém okolí se nachází zlatý důl, ve kterém těžíš zlaté valouny. 
-        // Touto surovinou můžeš následně platit za stavbu budov či rekrutování jednotek. 
-        // Pamatuj, že čím vyšší level dolu budeš mít tím vyšší počet zlata vytěžíš za hodinu.">
-        // <i class="fas fa-info-circle"></i>
-        // </button> VYŘEŠIT INFO BUTTON V castle.js NEFUNGUJE
+        this.infoButton = createElement('button');
+        this.infoButton.setAttribute('style', 'background-color: transparent; border: solid transparent; cursor: help;');
+        this.infoButton.setAttribute('title', (`Ve tvém okolí se nachází zlatý důl, ve kterém těžíš zlaté valouny. Touto surovinou můžeš následně platit za stavbu budov či rekrutování jednotek. Pamatuj, že čím vyšší level dolu budeš mít tím vyšší počet zlata vytěžíš za hodinu.`));
+        this.infoButton.innerHTML = '<i class="fas fa-info-circle"></i>';
 
         this.actualLevel = createElement('div', ['row', 'justify-content-start', 'mb-4']);
 
         this.acTitle = createElement('h5');
-        this.acTitle.innerHTML = 'Těžba při <b>aktuálním</b> stupni budovy'; //přidat data (Level x)
+        this.acTitle.innerHTML = 'Těžba při <b>aktuálním</b> stupni budovy';
 
-        this.acStatus = createElement('div', ['col']); //naplnit daty
+        this.acStatus = createElement('div', ['col']);
 
         this.actualLevel.append(this.acTitle, this.acStatus);
 
         this.nextLevel = createElement('div', ['row', 'justify-content-start', 'mb-4']);
 
         this.nlTitle = createElement('h5');
-        this.nlTitle.innerHTML = 'Těžba při <b>dalším</b> stupni budovy'; //přidat data (Level x+1)
+        this.nlTitle.innerHTML = 'Těžba při <b>dalším</b> stupni budovy';
 
-        this.nlStatus = createElement('div', ['col']); //naplnit daty
+        this.nlStatus = createElement('div', ['col']);
 
         this.nextLevel.append(this.nlTitle, this.nlStatus);
 
-        this.container.append(this.h1Title, this.hr, this.actualLevel, this.nextLevel);
+        this.container.append(this.h1Title, this.infoButton, this.hr, this.actualLevel, this.nextLevel);
 
         this.app.append(this.container);
     }
 
-    displayGoldMineData(data) {
+    bindDisplayGoldMineData(data) {
 
         let i = data.findIndex(data => data.link === 'gold-mine');
 
@@ -76,11 +74,11 @@ class Controller {
         this.model = model
         this.view = view
 
-        this.onDisplayGoldMineData(this.model.data);
+        this.handleDisplayGoldMineData(this.model.data);
     }
 
-    onDisplayGoldMineData = (data) => {
-        this.view.displayGoldMineData(data);
+    handleDisplayGoldMineData = (data) => {
+        this.view.bindDisplayGoldMineData(data);
     }
 }
 

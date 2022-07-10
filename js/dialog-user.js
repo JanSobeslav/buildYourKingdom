@@ -1,4 +1,4 @@
-import { createElement, getElement, save } from "./glMethods.js";
+import { createElement, getElement, save } from "./glFunctions.js";
 import { buildNavigation as nav } from "./navigation.js";
 
 class Model {
@@ -8,7 +8,7 @@ class Model {
         this.settings = data.settings;
     }
 
-    bindUserName(name) {
+    changeUserName(name) {
         this.settings.userName = name;
         save({ data: this.data, settings: this.settings });
     }
@@ -55,12 +55,14 @@ class View {
         this.dialog.showModal();
     }
 
-    createNewUser(data, handleNewUser) {
+    bindCreateNewUser(data, handleNewUser) {
         this.btnConfirm.addEventListener('click', () => {
-            if (this.inputUserName.value.trim().length > 7) {
+            if (this.inputUserName.value.trim().length >= 7) {
                 this.inputUserName.style.color = 'red';
+                this.btnConfirm.disabled = true;
                 setTimeout(() => {
                     this.inputUserName.style.color = 'black';
+                    this.btnConfirm.disabled = false;
                 }, 1000);
             } else {
                 this.inputUserName.style.color = 'black';
@@ -80,11 +82,11 @@ class Controller {
         this.model = model
         this.view = view
 
-        this.view.createNewUser({ data: this.model.data, settings: this.model.settings }, this.onConfirm);
+        this.view.bindCreateNewUser({ data: this.model.data, settings: this.model.settings }, this.handleConfirm);
     }
 
-    onConfirm = (name) => {
-        this.model.bindUserName(name);
+    handleConfirm = (name) => {
+        this.model.changeUserName(name);
     }
 
 }

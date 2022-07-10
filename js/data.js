@@ -25,7 +25,7 @@ let data = [
         name: "Kasárna",
         link: "barracks",
         active: "false",
-        level: 0,
+        level: 1,
         priceGold: 10,
         priceCoins: 1,
         time: 55, //ČAS ZJISTIT
@@ -100,17 +100,13 @@ let settings = {
     gold: 60,
     coins: 0,
     army: {
-        swordsmans: 5,
-        archers: 5,
+        swordsmans: 0,
+        archers: 0,
         horsemans: 0
     },
     event_attack: {
         time: 2,
-        units: {
-            swordsmans: 5,
-            archers: 0,
-            horsemans: 0
-        },
+        units: 1,
         arriveDate: "",
         attackState: false,
     },

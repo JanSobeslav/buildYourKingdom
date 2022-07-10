@@ -1,4 +1,4 @@
-import { displayBuildTime, createElement, getElement, save } from "./glMethods.js";
+import { displayBuildTime, createElement, getElement, save } from "./glFunctions.js";
 import { buildNavigation as nav } from "./navigation.js";
 
 class Model {
@@ -10,7 +10,7 @@ class Model {
         this._unchangedData = data.data;
     }
 
-    bindSubmit(submitData) {
+    submit(submitData) {
         const mintIndex = this.data.findIndex(b => b.link === 'mint');
         let date = new Date();
         date.setSeconds(date.getSeconds() + submitData.totalTime);
@@ -21,12 +21,12 @@ class Model {
         save({ data: this.data, settings: this.settings });
     }
 
-    bindActiveMintState(state) {
+    changeActiveMintState(state) {
         this.settings.activeMintState = state;
         save({ data: this.data, settings: this.settings });
     }
 
-    bindAddToCoins(coins) {
+    addToCoins(coins) {
         this.settings.coins += coins;
         save({ data: this.data, settings: this.settings });
     }
@@ -39,6 +39,11 @@ class View {
         this.container = createElement('div', ['container-fluid', 'px-4']);
 
         this.h1Title = createElement('h1', ['mt-4', 'mb-4']);
+        this.infoButton = createElement('button');
+        this.infoButton.setAttribute('style', 'background-color: transparent; border: solid transparent; cursor: help;');
+        this.infoButton.setAttribute('title', ('V mincovně máš možnost razit zlaté mince, které poslouží jako hodnotné platidlo. Buď ovšem rozvážný! Ne vždy se vyplatí jimi platit a obchodníci tě rádi oberou, někdy však moc dobře nepočítají.'));
+        this.infoButton.innerHTML = '<i class="fas fa-info-circle"></i>';
+
         this.hr = createElement('hr');
 
         this.contentHead = createElement('div', ['row', 'justify-content-start', 'mb-4']);
@@ -60,21 +65,16 @@ class View {
 
         this.contentRow = createElement('div', ['row', 'justify-content-start', 'mb-4']);
 
-        //display content
-
         this.contentRowNewLevel = createElement('div', ['row', 'justify-content-start', 'mb-4']);
 
-        //display content
-
-        this.container.append(this.h1Title, this.hr, this.contentHead, this.contentRow, this.hr, this.contentRowNewLevel);
+        this.container.append(this.h1Title, this.infoButton, this.hr, this.contentHead, this.contentRow, this.hr, this.contentRowNewLevel);
 
         this.app.append(this.container);
-
     }
 
-    displayCoins(data, settings, submitHandler, activeMintStateHandler, addToCoins) {
-        let i = data.findIndex(data => data.link === 'mint');
-        this.h1Title.innerHTML = data[i].name;
+    bindDisplayCoins(data, settings, submitHandler, activeMintStateHandler, addToCoins) {
+        let [mint] = data.filter(data => data.link === 'mint');
+        this.h1Title.innerHTML = mint.name;
 
         this.contentRow.innerHTML = `
         <div class="col-4">
@@ -84,10 +84,10 @@ class View {
             1
         </div>
         <div class="col-2" id="coinTime">
-            ${displayBuildTime(data[i].coin.time - (Math.pow(data[i].level, 3)))}
+            ${displayBuildTime((mint.coin.time - (Math.pow(mint.level, 3)))/settings.speedUp)}
         </div>
         <div class="col-2" id="coinPrice">
-            ${data[i].coin.price}
+            ${mint.coin.price}
         </div>
         <div class="col-2">
             <button class="btn btn-primary" id="okBtnMint">Vyrazit</button>
@@ -95,11 +95,11 @@ class View {
         `;
 
         this.contentRowNewLevel.innerHTML = `
-            <h5>Ražba zlatých mincí při příštím stupni budovy (Level ${data[i].level + 1})</h5>
+            <h5>Ražba zlatých mincí při příštím stupni budovy (Level ${mint.level + 1})</h5>
             <div class="col">
                 Vyražené mince: <b>1</b> <i class="fas fa-circle"
                     style="color: rgb(139, 126, 0);"></i> za <b style="color: darkgreen;">
-                    ${displayBuildTime(data[i].coin.time - (Math.pow(data[i].level + 1, 3)))}</b>
+                    ${displayBuildTime((mint.coin.time - (Math.pow(mint.level + 1, 3)))/settings.speedUp)}</b>
             </div>
         `;
 
@@ -112,12 +112,13 @@ class View {
         } else {
             okBtn.disabled = false;
         }
+        let time = (mint.coin.time - (mint.level * 0.5)) * input_value;
         input.addEventListener('change', (event) => {
             input_value = parseInt(event.target.value);
-            getElement('#coinTime').innerHTML = displayBuildTime((data[i].coin.time - (data[i].level * 0.5)) * input_value);
-            getElement('#coinPrice').innerHTML = (data[i].coin.price) * input_value;
+            getElement('#coinTime').innerHTML = displayBuildTime(((mint.coin.time - (mint.level * 0.5)) * input_value)/settings.speedUp);
+            getElement('#coinPrice').innerHTML = (mint.coin.price) * input_value;
             getElement('#coins').innerHTML = input_value;
-            if (input_value * data[i].coin.price > settings.gold) {
+            if (input_value * mint.coin.price > settings.gold) {
                 okBtn.disabled = true;
                 getElement('#coinPrice').style.color = 'red';
             } else {
@@ -126,14 +127,13 @@ class View {
             }
 
         });
-        let time = (data[i].coin.time - (data[i].level * 0.5)) * input_value;
         const dataSubmit = {
-            totalPrice: input_value * data[i].coin.price,
+            totalPrice: input_value * mint.coin.price,
             totalCoins: input_value,
-            totalTime: Math.round(time)
+            totalTime: Math.round(time/settings.time)
         };
         okBtn.addEventListener('click', () => {
-            if (input_value * data[i].coin.price <= settings.gold) {
+            if (input_value * mint.coin.price <= settings.gold) {
                 okBtn.disabled = true;
                 submitHandler(dataSubmit);
                 activeMintStateHandler(true);
@@ -150,7 +150,7 @@ class View {
 
         function upgrading() {
             const countdown = setInterval(() => {
-                let bTime = displayBuildTime(dataSubmit.totalTime, data[i].finishDateTime);
+                let bTime = displayBuildTime(dataSubmit.totalTime, mint.finishDateTime);
                 let timeElement = getElement('#coinTime');
                 if (timeElement) timeElement.innerHTML = `<strong style="color: darkgreen;">${bTime}</strong>`;
 
@@ -175,23 +175,23 @@ class Controller {
         this.model = model
         this.view = view
 
-        this.onDisplayCoins(this.model.data, this.model.settings, this.onSubmit, this.onActiveMintState, this.handleAddToCoins);
+        this.handleDisplayCoins(this.model.data, this.model.settings, this.handleSubmit, this.handleActiveMintState, this.handleAddToCoins);
     }
 
-    onDisplayCoins = (data, settings, submitHandler, mintStateHandler, addToCoins) => {
-        this.view.displayCoins(data, settings, submitHandler, mintStateHandler, addToCoins);
+    handleDisplayCoins = (data, settings, submitHandler, mintStateHandler, addToCoins) => {
+        this.view.bindDisplayCoins(data, settings, submitHandler, mintStateHandler, addToCoins);
     }
 
-    onSubmit = (data) => {
-        this.model.bindSubmit(data);
+    handleSubmit = (data) => {
+        this.model.submit(data);
     }
 
-    onActiveMintState = (state) => {
-        this.model.bindActiveMintState(state);
+    handleActiveMintState = (state) => {
+        this.model.changeActiveMintState(state);
     }
 
     handleAddToCoins = (coins) => {
-        this.model.bindAddToCoins(coins);
+        this.model.addToCoins(coins);
     }
 
 }

@@ -1,4 +1,4 @@
-import { createElement, getElement, save, serverTime } from "./glMethods.js";
+import { createElement, getElement, save, serverTime } from "./glFunctions.js";
 import { getData } from "./data.js";
 import { buildCastle as castle } from "./castle.js";
 import { buildGoldMine as mine } from "./gold-mine.js";
@@ -12,8 +12,8 @@ class Model {
         this.settings = data.settings;
     }
 
-    bindMenuItemsChange(callback) {
-        this.onMenuItemsChange = callback;
+    changeMenuItems(callback) {
+        this.handleMenuItemsChange = callback;
         save({ data: this.data, settings: this.settings });
     }
 
@@ -21,25 +21,24 @@ class Model {
         this.settings.activeLink = link;
         save({ data: this.data, settings: this.settings });
     }
+    startGame() {
+        if (!this.settings.startGameDate) {
+            this.settings.startGameDate = new Date();
+        }
+    }
 }
 
 class View {
     constructor(elName) {
         this.app = getElement(elName);
-        //root of sidebar
         this.sidenav = createElement('div');
         this.sidenav.id = 'layoutSidenav';
         this.side_nav = createElement('div');
         this.side_nav.id = 'layoutSidenav_nav';
-        //nav
         this.nav = createElement('nav', ['sb-sidenav', 'accordion', 'sb-sidenav-dark']);
         this.nav.id = 'sidenavAccordion';
-        //nav-menu
         this.navMenu = createElement('div', ['sb-sidenav-menu']);
-        //menu
         this.menu = createElement('div', ['nav']);
-        //menu items
-        //### NAČÍST MENU
         this.navMenu.append(this.menu);
         this.nav.append(this.navMenu);
         this.side_nav.append(this.nav);
@@ -55,25 +54,18 @@ class View {
 
         this.side_content.append(this.contentMain, this.svTime);
         this.sidenav.append(this.side_nav, this.side_content);
-        //
 
         this.app.append(this.sidenav);
-
-        this._temporaryItemsLinks = [];
     }
 
-    _initItemsLink(link) {
-        this._temporaryItemsLinks.push(link);
-    }
-
-    displaySidenavItems(data, settings) {
+    bindDisplaySidenavItems(data, settings) {
         const menuHeading = createElement('div', ['sb-sidenav-menu-heading']);
         menuHeading.textContent = 'Budovy';
-        let activeLink = settings.activeLink ? settings.activeLink : 'castle';
-        let urlLink = window.location.href;
-        [url, urlLink] = urlLink.split('/#/');
-        if (activeLink !== urlLink) activeLink = urlLink;
         this.menu.append(menuHeading);
+        let activeLink = settings.activeLink;
+        let urlAddress = window.location.href;
+        let [urlBef, urlLink] = urlAddress.split('/#/');
+        if (urlLink && (activeLink !== urlLink)) activeLink = urlLink;
         for (const d of data) {
             const a = createElement('a', ['nav-link', d.link]);
             a.href = '#/' + d.link;
@@ -82,35 +74,22 @@ class View {
             }
             a.innerHTML = '<div class="sb-nav-link-icon"><i class="' + d.icon + '"></i></div>' + d.name;
             this.menu.append(a);
-            this._initItemsLink(d.link);
         }
         const [building] = data.filter(b => b.link === activeLink);
-        this.displayContent(activeLink, 'content', building);
+        this.displayContent(building);
         getElement('#serverTime').innerHTML = serverTime();
     }
 
-    bindLinkChange(handler, data) {
-        //projde linky v _temporaryItemsLinks
-        for (let link of this._temporaryItemsLinks) {
-            //najde konkrétní link s třídou
-            let a = getElement('.' + link);
-            //přidá event click na tento el
-            a.addEventListener('click', event => {
-                //nalezne všechny a elementy
+    bindLinkChange(linkChangeHandler, data) {
+        for (let d of data) {
+            let a = getElement('.' + d.link);
+            a.addEventListener('click', () => {
                 let aLinks = document.getElementsByTagName('a');
-                //odstraní třídu active
-                for (let aL of aLinks) {
-                    aL.classList.remove("active");
-                }
-                //pokud se target rovná konkrétní třídě
-                if (event.target.className === ('nav-link ' + link)) {
-                    //najde element s id content, odstraní z něj veškeré children a vloží konrétní komponentu
-                    let content = getElement('#content');
-                    content.innerHTML = '';
+                for (let aL of aLinks) { aL.classList.remove("active"); }
+                if (a.className === ('nav-link ' + d.link)) {
                     a.classList.add("active");
-                    handler(link);
-                    const [building] = data.filter(b => {if (b.link === link) return b;});
-                    this.displayContent(link, content.id, building);
+                    linkChangeHandler(d.link);
+                    this.displayContent(d);
                 } else {
                     a.classList.remove("active");
                 }
@@ -118,24 +97,25 @@ class View {
         }
     }
 
-    displayContent(link, id, building) {
+    displayContent(building) {
+        getElement('#content').innerHTML = '';
         if (building.level > 0) {
-            switch (link) {
+            switch (building.link) {
                 case 'castle':
-                    castle(('#' + id), getData());
+                    castle(('#content'), getData());
                     break;
                 case 'gold-mine':
-                    mine(('#' + id), getData());
+                    mine(('#content'), getData());
                     break;
                 case 'barracks':
-                    barracks(('#' + id), getData());
+                    barracks(('#content'), getData());
                     break;
                 case 'mint':
-                    mint(('#' + id), getData());
+                    mint(('#content'), getData());
                     break;
             }
         } else {
-            getElement('#' + id).innerHTML = `<h2 class="display-4 m-5">Budova ještě nebyla postavena!</h2>`;
+            getElement('#content').innerHTML = `<h2 class="display-4 m-5">Budova dosud nebyla postavena!</h2>`;
         }
     }
 }
@@ -145,13 +125,14 @@ class Controller {
         this.model = model
         this.view = view
 
-        this.model.bindMenuItemsChange(this.onMenuItemsChange);
-        this.onMenuItemsChange(this.model.data, this.model.settings);
+        this.model.changeMenuItems(this.handleMenuItemsChange);
+        this.model.startGame();
+        this.handleMenuItemsChange(this.model.data, this.model.settings);
         this.view.bindLinkChange(this.handleLinkChange, this.model.data);
     }
 
-    onMenuItemsChange = (data, settings) => {
-        this.view.displaySidenavItems(data, settings);
+    handleMenuItemsChange = (data, settings) => {
+        this.view.bindDisplaySidenavItems(data, settings);
     }
 
     handleLinkChange = (link) => {
